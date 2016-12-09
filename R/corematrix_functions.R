@@ -1,12 +1,15 @@
 #' Preprocess gencode file
 #'
-#' Filter gencode file to include only genes on chromosome 1-22,X,Y,M and reformat before returning as \code{data.table}
+#' Filter gencode file to include only genes on chromosome 1-22,X,Y,M and reformat before returning
+#' as \code{data.table}
 #'
-#' Gencode files are downloaded from \link{http://www.gencodegenes.org/releases/grch37_mapped_releases.html}
+#' Gencode files are downloaded from
+#' \link{http://www.gencodegenes.org/releases/grch37_mapped_releases.html}
 #'
 #' Assumed input format .gtf.gz:
 #' \itemize{
-#'  \item{1) }{chromosome name chr\{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M\} or GRC accession}
+#'  \item{1) }{chromosome name chr\{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M\}
+#'            or GRC accession}
 #'  \item{2) }{annotation source \{ENSEMBL,HAVANA\}}
 #'  \item{3) }{feature type \{gene,transcript,exon,CDS,UTR,start_codon,stop_codon,Selenocysteine\}}
 #'  \item{4) }{genomic start location integer-value (1-based)}
@@ -21,10 +24,10 @@
 #' chromosomes other than 1-2,X,Y,M are removed. The resulting chromosome values are cast into
 #' an ordered factor (ordering: 1-22,X,Y,M). Then additional columns are extracted from the
 #' key,value pairs in the info column. Any genes with gene_types in \code{c('misc_RNA','snoRNA','snRNA')}
-#' are removed. Finally the redundant columns score, phase, and info are removed and a new column ensembl_gene_id
-#' is created from gene_id that does not contain subnumbering (i.e. id is x instead of x.y).
-#' The resulting file still contains duplicate gene names, but these will be removed after the merge with
-#' the canonical hgnc data.
+#' are removed. Finally the redundant columns score, phase, and info are removed and a
+#' new column ensembl_gene_id is created from gene_id that does not contain subnumbering
+#' (i.e. id is x instead of x.y). The resulting file still contains duplicate gene names,
+#' but these will be removed after the merge with the canonical hgnc data.
 
 #' @param gencode_path file path of downloaded .gtf.gz file
 #' @return processed gencode table as \code{data.table}
@@ -79,8 +82,9 @@ process_gencodefile <- function(gencode_path) {
     names(info_cols) <- info_colnames
     for (colname in info_colnames) {
         message("Adding column ", colname)
-        info_cols[[colname]] <- sapply(s, function(x) ifelse(any(startsWith(x, colname)), gsub("\"", "", strsplit(x[startsWith(x,
-            colname)], split = " ")[[1]][2]), NA))
+        info_cols[[colname]] <- sapply(s, function(x) ifelse(any(startsWith(x, colname)),
+                                                      gsub("\"", "", strsplit(x[startsWith(x,
+                                                      colname)], split = " ")[[1]][2]), NA))
     }
     gencode[, `:=`((info_colnames), info_cols)]
 
@@ -88,8 +92,9 @@ process_gencodefile <- function(gencode_path) {
     message("Deleting genes with >1 mapping or remap_status not 'full_contig' or 'automatic_gene'")
     del_tags <- c("fragmented_locus", "reference_genome_error", "semi-processed")
     message("Deleting genes with remap tag: ", paste(del_tags, collapse = ", "))
-    gencode <- gencode[(remap_num_mappings == 1 | is.na(remap_num_mappings)) & remap_status %in% c("full_contig",
-        "automatic_gene") & !(tag %in% del_tags), ]
+    gencode <- gencode[(remap_num_mappings == 1 | is.na(remap_num_mappings)) &
+                         remap_status %in% c("full_contig",
+                          "automatic_gene") & !(tag %in% del_tags), ]
 
     # Filter on gene_type
     del_gene_types <- c("misc_RNA", "snoRNA", "snRNA")
@@ -144,9 +149,11 @@ process_gencodefile <- function(gencode_path) {
 #' }
 process_hgncfile <- function(hgnc_path, value_sep) {
 
-    columns <- c("hgnc_id", "symbol", "name", "locus_group", "locus_type", "gene_family", "gene_family_id", "alias_symbol",
-        "alias_name", "prev_symbol", "location", "date_symbol_changed", "date_modified", "entrez_id", "ensembl_gene_id",
-        "vega_id", "ucsc_id", "refseq_accession", "ccds_id", "uniprot_ids", "pubmed_id", "omim_id")
+    columns <- c("hgnc_id", "symbol", "name", "locus_group", "locus_type", "gene_family",
+                 "gene_family_id", "alias_symbol", "alias_name", "prev_symbol", "location",
+                 "date_symbol_changed", "date_modified", "entrez_id", "ensembl_gene_id",
+                 "vega_id", "ucsc_id", "refseq_accession", "ccds_id", "uniprot_ids",
+                 "pubmed_id", "omim_id")
 
     hgnc <- fread(hgnc_path, colClasses = "character")
 
@@ -164,18 +171,21 @@ process_hgncfile <- function(hgnc_path, value_sep) {
     s2 <- strsplit(hgnc$prev_symbol, split = "|", fixed = T)
     alias_list2 <- sapply(s2, function(x) ifelse(length(x) == 0, "", paste(x, collapse = value_sep)))
 
-    hgnc[, `:=`(aliases, gsub(paste0("^", value_sep, "|", value_sep, "$"), "", paste(alias_list1, alias_list2, sep = value_sep)))]
+    hgnc[, `:=`(aliases, gsub(paste0("^", value_sep, "|", value_sep, "$"),
+                              "", paste(alias_list1, alias_list2, sep = value_sep)))]
 
     message("Change field separator string into custom separator ", value_sep)
 
     for (col_name in names(hgnc)) {
         if (class(hgnc[, col_name, with = F][[1]]) == "character")
-            hgnc[, `:=`(col_name, gsub("|", value_sep, hgnc[, col_name, with = F][[1]], fixed = T)), with = F]
+            hgnc[, `:=`(col_name, gsub("|", value_sep, hgnc[, col_name, with = F][[1]], fixed = T)),
+                 with = F]
     }
 
     message("Add chr column based on location and delete genes with locations not in 1-22,X,Y,M")
     chr_ids <- c(as.character(1:22), "X", "Y", "M")
-    chr <- toupper(sapply(strsplit(hgnc$location, split = "[ a-ln-wA-LN-WzZ_]", fixed = F), function(x) x[1]))
+    chr <- toupper(sapply(strsplit(hgnc$location, split = "[ a-ln-wA-LN-WzZ_]", fixed = F),
+                          function(x) x[1]))
     hgnc[, `:=`(chr, factor(chr, levels = chr_ids, ordered = T))]
     hgnc <- subset(hgnc, !is.na(chr))
 
@@ -205,12 +215,15 @@ process_entrezfile <- function(entrez_path, value_sep) {
 
     entrez <- fread(paste("zcat", entrez_path))
 
-    old_columns <- c("GeneID", "Symbol", "Synonyms", "dbXrefs", "chromosome", "map_location", "description", "type_of_gene",
-        "Symbol_from_nomenclature_authority", "Full_name_from_nomenclature_authority", "Nomenclature_status", "Other_designations")
+    old_columns <- c("GeneID", "Symbol", "Synonyms", "dbXrefs", "chromosome", "map_location",
+                     "description", "type_of_gene", "Symbol_from_nomenclature_authority",
+                     "Full_name_from_nomenclature_authority", "Nomenclature_status",
+                     "Other_designations")
 
-    new_names <- c("entrez_id", "entrez_gene_name", "entrez_aliases", "entrez_dbXrefs", "chr", "entrez_map_location",
-        "entrez_description", "entrez_type_of_gene", "entrez_hgncsymbol", "entrez_hgncname", "entrez_hgnc_status",
-        "entrez_other_designations")
+    new_names <- c("entrez_id", "entrez_gene_name", "entrez_aliases", "entrez_dbXrefs", "chr",
+                   "entrez_map_location", "entrez_description", "entrez_type_of_gene",
+                   "entrez_hgncsymbol", "entrez_hgncname", "entrez_hgnc_status",
+                   "entrez_other_designations")
 
     entrez <- entrez[, old_columns, with = F]
 
@@ -221,7 +234,8 @@ process_entrezfile <- function(entrez_path, value_sep) {
 
     for (col_name in names(entrez)) {
         if (class(entrez[, col_name, with = F][[1]]) == "character")
-            entrez[, `:=`(col_name, gsub("|", value_sep, entrez[, col_name, with = F][[1]], fixed = T)), with = F]
+            entrez[, `:=`(col_name, gsub("|", value_sep, entrez[, col_name, with = F][[1]],
+                                         fixed = T)), with = F]
     }
 
     message("Add chr column based on location and delete genes with locations not in 1-22,X,Y,M")
@@ -241,7 +255,8 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
     gencode_hgnc_suffixes <- c("_gencode", "_hgnc")
 
     # First merge on gene_name,ensembl_id(30594 unique symbols/ensemble ids)
-    df <- merge(gencode, hgnc, by.x = c("ensembl_gene_id", "gene_name", "chr"), by.y = c("ensembl_gene_id", "symbol",
+    df <- merge(gencode, hgnc, by.x = c("ensembl_gene_id", "gene_name", "chr"),
+                by.y = c("ensembl_gene_id", "symbol",
         "chr"), suffixes = gencode_hgnc_suffixes)
     df[, `:=`(merge_trial, 1)]
     df[, `:=`(symbol, gene_name)]
@@ -252,7 +267,8 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
     gencode_remain <- gencode[!ensembl_gene_id %in% df$ensembl_gene_id | !gene_name %in% df$symbol, ]
     hgnc_remain <- hgnc[!symbol %in% df$symbol | !ensembl_gene_id %in% df$ensembl_gene_id, ]
 
-    df2 <- merge(gencode_remain, hgnc_remain, by.x = c("gene_name", "chr"), by.y = c("symbol", "chr"), suffixes = gencode_hgnc_suffixes)
+    df2 <- merge(gencode_remain, hgnc_remain, by.x = c("gene_name", "chr"), by.y = c("symbol", "chr"),
+                 suffixes = gencode_hgnc_suffixes)
     df2[, `:=`(merge_trial, 2)]
     df2[, `:=`(symbol, gene_name)]
 
@@ -267,8 +283,9 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
     gencode_remain <- gencode[!ensembl_gene_id %in% df$ensembl_gene_id | !gene_name %in% df$symbol, ]
     hgnc_remain <- hgnc[!symbol %in% df$symbol | !ensembl_gene_id %in% df$ensembl_gene_id, ]
 
-    df2 <- merge(gencode_remain, hgnc_remain, by.x = c("ensembl_gene_id", "chr"), by.y = c("ensembl_gene_id", "chr"),
-        suffixes = gencode_hgnc_suffixes)
+    df2 <- merge(gencode_remain, hgnc_remain, by.x = c("ensembl_gene_id", "chr"),
+                  by.y = c("ensembl_gene_id", "chr"),
+                  suffixes = gencode_hgnc_suffixes)
     df2[, `:=`(merge_trial, 3)]
 
 
@@ -277,11 +294,13 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
     message("Third merge on ensemble gene id, and chromosome: ", nrow(df2), " additional genes")
 
     # Check and fix vega_id matching between ENCODE and hgnc
-    vega_id_nomatch <- as.numeric(df[, paste0("vega_id", gencode_hgnc_suffixes[1]), with = F][[1]] != df[, paste0("vega_id",
-        gencode_hgnc_suffixes[2]), with = F][[1]])
+    vega_id_nomatch <- as.numeric(df[, paste0("vega_id",
+                                  encode_hgnc_suffixes[1]), with = F][[1]] != df[, paste0("vega_id",
+                                  gencode_hgnc_suffixes[2]), with = F][[1]])
     n_nonmatching_vegaid <- sum(vega_id_nomatch, na.rm = T)
     if (n_nonmatching_vegaid > 0) {
-        message("Warning: vega_id is different between GENCODE and HGNC file for ", n_nonmatching_vegaid, " genes ")
+        message("Warning: vega_id is different between GENCODE and HGNC file for ",
+                n_nonmatching_vegaid, " genes ")
         message("Warning: vega_id of GENCODE file is leading downstream")
     }
 
@@ -298,7 +317,8 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
 
 #' Merge gencode and hgnc file
 merge_core_entrez <- function(core, entrez) {
-    df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr"), by.y = c("entrez_id", "entrez_gene_name", "chr"))
+    df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr"),
+                by.y = c("entrez_id", "entrez_gene_name", "chr"))
     uniq_entrez_ids <- as.numeric(names(table(df$entrez_id)[table(df$entrez_id) == 1]))
 
     message("Removing ", nrow(df) - length(uniq_entrez_ids), " gene entries due to duplicate entrez id")
@@ -313,15 +333,24 @@ merge_core_entrez <- function(core, entrez) {
 #' Assumes chr as factor 1-22,X,Y,M
 is_par <- function(chr, start_pos, end_pos, build = "b37") {
     if (build == "b37") {
-        return((chr == "Y" & (end_pos <= 2649520 | start_pos >= 59034050)) | (chr == "X" & (end_pos <= 2699520 |
-            start_pos >= 154931044)))
+        return((chr == "Y" & (end_pos <= 2649520 | start_pos >= 59034050)) |
+               (chr == "X" & (end_pos <= 2699520 | start_pos >= 154931044)))
     } else {
         message("Error: Genome Build ", build, " is not implemented")
         exit(0)
     }
 }
 
-# TODO CHECK
+#' Core matrix is a merge between gencode, entrez and hgnc data.
+#'
+#' Gene definitions are based on gencode. Entrez ids and official hgnc symbols are merged in
+#' Gene symbols in the resulting file are unique and only contains gencode genes that could be
+#' reliably matched with entrez and hgnc data. All three data sources are preprocessed and filtered
+#' before matching (see repsective preprocessing and merge functions for details).
+#'
+#' @gencode_path
+#'
+#' @export
 create_core_matrix <- function(gencode_path, hgnc_path, entrez_path, value_sep, download_dir) {
 
     gencode_path <- file.path(download_dir, basename(gencode_url))
@@ -341,9 +370,24 @@ create_core_matrix <- function(gencode_path, hgnc_path, entrez_path, value_sep, 
     return(core)
 }
 
-#TO DO CHECK#
-get_core_matrix <- function(){
-  create_core_matrix(gencode_url, hgnc_url, entrez_url, value_sep, cache_dir)
+#' Load core gene matrix and create it first if it does not exist
+#'
+#' A wrapper around \code{create_core_matrix()}
+#'
+#' @param settings
+#' @export
+get_core_matrix <- function(settings=gm_settings){
+  for (setting in c("gencode_url","hgnc_url","enrez_url","value_sep","cache_dir"))
+  {
+    if(!setting %in% names(settings)) stop("ERROR: ",setting, " not in settings")
+  }
+
+  core <- create_core_matrix(settings$gencode_url, settings$hgnc_url,
+                             settings$entrez_url, settings$value_sep, settings$cache_dir)
+
 }
+
+
+
 
 

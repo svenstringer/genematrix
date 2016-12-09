@@ -1,12 +1,12 @@
 #Assumes R3.3.1+
 
-#' Create and save annotated Gene Matrix
+#' Save annotated Gene Matrix
 #'
 #' Main function to generate a default Gene Matrix and store it in a data.table.
-#' The first time this may take a long time (up to an hour). Will be much quicker due to cached
-#' third party sources.
+#' The first time this may take a long time (up to an hour). Will be much quicker due to caching later.
 #'
-#' @param settings a list with user specified settings
+#' @param settings a named list with user specified settings. Defaults to global defaults in gm_setting
+#'     stored in config.R
 #' @export
 generate_genematrix <- function(settings=gm_settings){
 
@@ -25,7 +25,7 @@ check_path(cache_dir)
 
 message("Gene matrix file will be saved as: ", gene_matrix_path)
 
-# Merge gencode hgnc and entrez
+# Create core gene matrix by processing and merging gencode, hgnc, and entrez data
 core <- get_core_matrix(settings)
 
 # Create mapping from alias to official gene symbols
@@ -35,6 +35,7 @@ gene_translation_table <- get_symbol_table(core,  settings)
 # Add custom annotation to create final gene matrix
 gene_matrix <- add_annotations(core, gene_translation_table, settings)
 
+#Save specified columns to final output
 publish_genematrix(gene_matrix, settings)
 
 message("Gene matrix saved as ", gene_matrix_path)
@@ -82,7 +83,6 @@ publish_genematrix <- function(gene_matrix, settings) {
 
 
 
-create_symbol_table(core, value_sep = value_sep, excel_col = T)
 
 
 
