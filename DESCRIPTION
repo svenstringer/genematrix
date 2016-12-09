@@ -1,0 +1,25 @@
+Package: GeneMatrix
+Title: Create a Table with Gene Annotation and Output in Convenient Format.
+Version: 0.1
+Authors@R: person("Sven", "Stringer", email = "s.stringer@vu.nl", role = c("aut", "cre"))
+Description: The GeneMatrix package is designed to create an annotated
+    gene table based on Gencode gene definitions, with a focus on brain-related
+    information. Gene definitions are based on Gencode, matched with entrez genes
+    and the official HGNC gene names to create a core matrix. This preprocessed and
+    filtered core matrix includes the final genes that can be annotated with third-
+    party information. Currently the following annotations can be included: Exac
+    pLI constraint scores for all exac subjects and subjects without a psychiatric
+    disorder, Brain Expression levels and diffrential expression SCZ vs controls in
+    PLFC based on Common Mind data, Gwas catalog hits, OMIM associations, Gene-based
+    p-values for several brain-related phenotypes,
+Depends:
+    R (>= 3.3.1)
+Imports:
+    data.table
+License: None
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

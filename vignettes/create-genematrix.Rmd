@@ -1,0 +1,71 @@
+---
+title: "Creating a gene matrix"
+author: "Sven Stringer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Creating a Gene Matrix}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+# Introduction
+
+The GeneMatrix package is designed to create an annotated gene table based on Gencode gene definitions, with a focus  on brain-related information. Gene definitions are based on Gencode, matched with entrez genes and the official HGNC gene names to create a core matrix. This preprocessed and filtered core matrix includes the final genes that can be annotated with third-party information. Currently the following annotations can be included:
+
+* Exac pLI constraint scores for all exac subjects and subjects without a psychiatric disorder.
+* Brain Expression levels and diffrential expression SCZ vs controls in PLFC based on Common Mind data.
+* Gwas catalog hits
+* OMIM associations
+* Gene-based p-values for several brain-related phenotypes
+
+The package was developed in R version 3.3.1 and currently only is compatible with linux.
+
+# Installation
+
+The GeneMatrix R package is available on [Github](https://github.com/svenstringer/genematrix).
+
+# Quickly creating the default Gene Matrix
+
+To create a default gene matrix, run the following code in R:
+
+>publish_default_genematrix()
+
+The first run may take up to an hour, to 
+# Creating a custom gene-matrix in steps
+
+Although the publish_default_genematrix
+
+## Core gene matrix
+
+All third-party annotation will be merged into the core gene matrix. The creation of this core gene matrix involves several steps.
+
+## Exac pLI constraint scores
+
+## Brain expression
+
+The brain expression 
+
+## GWAS catalog hits
+
+## OMIM associations
+
+## Gene-based p-values
+
+It is possible to add gene-based p-values for any phenotype as long as summary statistics are available for each phenotype in a specific format in a specified folder.
+
+# Acknowledgements
+
+This package is inspired by a previous implementation of the Gene Matrix by Patrick Sullivan and financially supported by Danielle Posthuma.
+
+
+When using third-party annotation in you analysis don't forget to put the following acknowledgements in your publications
+
+## The exac consortium
+
+## CommonMind Consortium
+
+The following acknowledgment applies to the brain expression annotation.
+
+> Data were generated as part of the CommonMind Consortium supported by funding from Takeda Pharmaceuticals Company Limited, F. Hoffman-La Roche Ltd and NIH grants R01MH085542, R01MH093725, P50MH066392, P50MH080405, R01MH097276, RO1-MH-075916, P50M096891, P50MH084053S1, R37MH057881 and R37MH057881S1, HHSN271201300031C, AG02219, AG05138 and MH06692. Brain tissue for the study was obtained from the following brain bank collections: the Mount Sinai NIH Brain and Tissue Repository, the University of Pennsylvania Alzheimer’s Disease Core Center, the University of Pittsburgh NeuroBioBank and Brain and Tissue Repositories and the NIMH Human Brain Collection Core. CMC Leadership: Pamela Sklar, Joseph Buxbaum (Icahn School of Medicine at Mount Sinai), Bernie Devlin, David Lewis (University of Pittsburgh), Raquel Gur, Chang-Gyu Hahn (University of Pennsylvania), Keisuke Hirai, Hiroyoshi Toyoshiba (Takeda Pharmaceuticals Company Limited), Enrico Domenici, Laurent Essioux (F. Hoffman-La Roche Ltd), Lara Mangravite, Mette Peters (Sage Bionetworks), Thomas Lehner, Barbara Lipska (NIMH).
