@@ -4,20 +4,10 @@ uniform_genenames <- function(genenames) {
     return(unif_symbols)
 }
 
-#' Load gene name translation table and create if it does not exist
-#' @export
-get_symbol_table <- function(core, settings, excel_col=settings$add_excel_collisions) {
-  if(file.exists(settings$core_path)){
-    load(settings$gtt_path)
-  }else{
-    gene_translation_table <- create_symbol_table(core_matrix,settings$value_sep,excel_col)
-    save(gene_translation_table,file=settings$gtt_path)
-  }
-}
 
 #' Load gene name translation table and create if it does not exist
 #' @export
-get_symbol_table <- function(core, settings, excel_col=settings$add_excel_collisions) {
+get_symbol_table <- function(core_matrix, settings, excel_col=settings$add_excel_collisions) {
   if(file.exists(settings$core_path)){
     load(settings$gtt_path)
   }else{
@@ -103,7 +93,7 @@ add_excel_collisions <- function(symbol_table) {
         "match.length"), nchar(x))))
 
     df$matches <- pmatch(df$alias_prefixes, months_full, duplicates.ok = T)
-    df <- subset(df, sapply(1:length(alias_prefixes), function(i) !is.na(matches[i]) & nchar(alias_prefixes[i]) >
+    df <- subset(df, sapply(1:length(df$alias_prefixes), function(i) !is.na(df$matches[i]) & nchar(df$alias_prefixes[i]) >
         2))
 
     df <- subset(df, nchar(df$alias_prefixes) > 2 & as.numeric(df$alias_digits) <= 31)

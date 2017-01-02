@@ -141,12 +141,9 @@ process_gencodefile <- function(gencode_path) {
 #'
 #' 4) Change '|' value separater into ';'
 #'
-#' @param hgnc file path of downloaded .txt file
+#' @param hgnc_path file path of downloaded .txt file
+#' @param value_sep character string to separate multi-value fields
 #' @return processed hgnc table as data.table
-#' @examples
-#' \dontrun{
-#' hgnc_data <- process_hgnc(hgnc_path)
-#' }
 process_hgncfile <- function(hgnc_path, value_sep) {
 
     columns <- c("hgnc_id", "symbol", "name", "locus_group", "locus_type", "gene_family",
@@ -336,8 +333,7 @@ is_par <- function(chr, start_pos, end_pos, build = "b37") {
         return((chr == "Y" & (end_pos <= 2649520 | start_pos >= 59034050)) |
                (chr == "X" & (end_pos <= 2699520 | start_pos >= 154931044)))
     } else {
-        message("Error: Genome Build ", build, " is not implemented")
-        exit(0)
+        stop("Error: Genome Build ", build, " is not implemented")
     }
 }
 
@@ -347,11 +343,14 @@ is_par <- function(chr, start_pos, end_pos, build = "b37") {
 #' Gene symbols in the resulting file are unique and only contains gencode genes that could be
 #' reliably matched with entrez and hgnc data. All three data sources are preprocessed and filtered
 #' before matching (see repsective preprocessing and merge functions for details).
-#'
-#' @gencode_path
+#' @param gencode_url url to download gencode file from.
+#' @param hgnc_url url to download hgnc file from.
+#' @param entrez_url url to download entrez file from.
+#' @param value_sep character string separating values in multi-value fields.
+#' @param download_dir directory to save gencode, hgnc, and entrez source files.
 #'
 #' @export
-create_core_matrix <- function(gencode_path, hgnc_path, entrez_path, value_sep, download_dir) {
+create_core_matrix <- function(gencode_url,hgnc_url,entrez_url,value_sep, download_dir) {
 
     gencode_path <- file.path(download_dir, basename(gencode_url))
     hgnc_path <- file.path(download_dir, basename(hgnc_url))
@@ -370,11 +369,12 @@ create_core_matrix <- function(gencode_path, hgnc_path, entrez_path, value_sep, 
     return(core)
 }
 
+
 #' Load core gene matrix and create it first if it does not exist
 #'
 #' A wrapper around \code{create_core_matrix()}
 #'
-#' @param settings
+#' @param settings list with settings (defaults to global genematrix settings gm_settings)
 #' @export
 get_core_matrix <- function(settings=gm_settings){
   for (setting in c("gencode_url","hgnc_url","enrez_url","value_sep","cache_dir"))
@@ -384,10 +384,4 @@ get_core_matrix <- function(settings=gm_settings){
 
   core <- create_core_matrix(settings$gencode_url, settings$hgnc_url,
                              settings$entrez_url, settings$value_sep, settings$cache_dir)
-
 }
-
-
-
-
-

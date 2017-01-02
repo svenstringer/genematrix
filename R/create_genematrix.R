@@ -11,12 +11,10 @@
 generate_genematrix <- function(settings=gm_settings){
 
 stopifnot(c("gencode_version","cache_dir") %in% settings )
-attach(settings)
-on.exit(detach(settings), add = T)
 
 #If no gene_matrix_path is found in settings list a default filename is save in the current working directory.
 if(! gene_matrix_path %in% names(settings) ){
-  gene_matrix_file <- paste0("genematrix_core_gencode", gencode_version, "_", Sys.Date(), ".csv")
+  gene_matrix_file <- paste0("genematrix_core_gencode", settings$gencode_version, "_", Sys.Date(), ".csv")
   gene_matrix_path <- file.path(getwd(), gene_matrix_file)
 }
 
@@ -42,6 +40,8 @@ message("Gene matrix saved as ", gene_matrix_path)
 
 }
 
+
+
 #' Add annotations to core gene matrix
 #'
 #' Adds several types of gene annotation to the core matrix, such as constraint scores,
@@ -63,6 +63,7 @@ add_annotations <- function(core, gene_translation_table,settings) {
   return(gene_matrix)
 }
 
+
 #' Save customized gene matrix based on settings
 #'
 #' Publish gene matrix in .csv format including user-set columns
@@ -73,7 +74,7 @@ add_annotations <- function(core, gene_translation_table,settings) {
 #' @return None
 #'
 #' @export
-publish_genematrix <- function(gene_matrix, settings) {
+publish_genematrix <- function(gene_matrix, gene_matrix_path) {
   output_cols <- c('chr','chr_name','chr_plink','start','end','symbol','aliases','strand','merge_trial','tag','source','feature','remap_status','hgnc_id')
   output_df <- gene_matrix[,output_cols,with=F]
   write.table(output_df,file=gene_matrix_path,quote=T,sep='\t',row.names=F)

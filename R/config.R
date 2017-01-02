@@ -1,4 +1,6 @@
 #' @import data.table
+#' @importFrom stats end start
+#' @importFrom utils download.file write.table
 NULL
 
 gencode_version <- 24

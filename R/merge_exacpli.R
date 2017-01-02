@@ -25,10 +25,10 @@ is_pli_match <- function(chr_pli, chr, start, cds_start, gene_bp_dif) {
 #' Merge exac pli constraint data into gene matrix
 merge_exacpli <- function(pli_url, gene_matrix, gene_translation_table, gene_bp_dif = 5e+05) {
     pli_suffix <- NA
-    if (pli_url == fullexacpli_url) {
+    if (pli_url == gm_settings$fullexacpli_url) {
         pli_suffix <- "fullexac"
     }
-    if (pli_url == nonpsychexacpli_url) {
+    if (pli_url == gm_settings$nonpsychexacpli_url) {
         pli_suffix <- "nonpsychexac"
     }
     stopifnot(!is.na(pli_suffix))

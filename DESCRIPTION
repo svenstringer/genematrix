@@ -1,6 +1,6 @@
 Package: GeneMatrix
-Title: Create a Table with Gene Annotation and Output in Convenient Format.
-Version: 0.1
+Title: Create a Table with Gene Annotation and Output in Convenient Format
+Version: 1.0.0
 Authors@R: person("Sven", "Stringer", email = "s.stringer@vu.nl", role = c("aut", "cre"))
 Description: The GeneMatrix package is designed to create an annotated
     gene table based on Gencode gene definitions, with a focus on brain-related
@@ -11,11 +11,12 @@ Description: The GeneMatrix package is designed to create an annotated
     pLI constraint scores for all exac subjects and subjects without a psychiatric
     disorder, Brain Expression levels and diffrential expression SCZ vs controls in
     PLFC based on Common Mind data, Gwas catalog hits, OMIM associations, Gene-based
-    p-values for several brain-related phenotypes,
+    p-values for several brain-related phenotypes. This software is created in collaboration with Patrick Sullivan.
 Depends:
     R (>= 3.3.1)
 Imports:
-    data.table
+    data.table,
+    utils, stats
 License: None
 Encoding: UTF-8
 LazyData: true

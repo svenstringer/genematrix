@@ -4,7 +4,7 @@
 \alias{add_annotations}
 \title{Add annotations to core gene matrix}
 \usage{
-add_annotations(core, gene_translation_table, annotations, value_sep)
+add_annotations(core, gene_translation_table, settings)
 }
 \arguments{
 \item{core}{core gene matrix to add annotation to}

@@ -4,13 +4,10 @@
 \alias{get_symbol_table}
 \title{Load gene name translation table and create if it does not exist}
 \usage{
-get_symbol_table(core, settings, excel_col = settings$add_excel_collisions)
-
-get_symbol_table(core, settings, excel_col = settings$add_excel_collisions)
+get_symbol_table(core_matrix, settings,
+  excel_col = settings$add_excel_collisions)
 }
 \description{
-Load gene name translation table and create if it does not exist
-
 Load gene name translation table and create if it does not exist
 }
 

@@ -28,8 +28,7 @@ download_source <- function(source_url, dest_path) {
 create_dir <- function(dir_name) {
   dir.create(dir_name, showWarnings = FALSE)
   if (!file.exists(dir_name)) {
-    message("ERROR: directory ", dir_name, " could not be created")
-    exit(0)
+    stop("ERROR: directory ", dir_name, " could not be created")
   }
 }
 

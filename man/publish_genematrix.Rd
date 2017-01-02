@@ -4,7 +4,7 @@
 \alias{publish_genematrix}
 \title{Save customized gene matrix based on settings}
 \usage{
-publish_genematrix(gene_matrix, settings)
+publish_genematrix(gene_matrix, gene_matrix_path)
 }
 \arguments{
 \item{gene_matrix}{a data.table with gene annotation to save}
