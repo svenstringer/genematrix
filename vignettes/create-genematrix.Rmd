@@ -30,16 +30,24 @@ The GeneMatrix R package is available on [Github](https://github.com/svenstringe
 
 To create a default gene matrix, run the following code in R:
 
->publish_default_genematrix()
+>generate_genematrix()
 
-The first run may take up to an hour, to 
+The first run may take up to an hour. Future runs will be much quicker due to cached third-party resources and cached intermediate results.
 # Creating a custom gene-matrix in steps
 
-Although the publish_default_genematrix
+While `generate_genematrix()` runs through all steps to create a default GeneMatrix, it is possible to complete the intermediate steps manually. 
 
 ## Core gene matrix
 
-All third-party annotation will be merged into the core gene matrix. The creation of this core gene matrix involves several steps.
+Before adding third-party gene annotations. A core matrix with gene (defnitions) needs to be created.
+
+This can be done with
+
+>core <- get_core_matrix()
+
+The creation of this core gene matrix involves several steps.
+
+
 
 ## Exac pLI constraint scores
 
@@ -60,7 +68,7 @@ It is possible to add gene-based p-values for any phenotype as long as summary s
 This package is inspired by a previous implementation of the Gene Matrix by Patrick Sullivan and financially supported by Danielle Posthuma.
 
 
-When using third-party annotation in you analysis don't forget to put the following acknowledgements in your publications
+When using third-party annotation in you analysis don't forget to put the following acknowledgements in your publications.
 
 ## The exac consortium
 
