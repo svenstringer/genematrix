@@ -11,7 +11,7 @@ download_source <- function(source_url, dest_path) {
 
   if (!file.exists(dest_path)) {
     message("Downloading ", source_url, " to ", dest_path)
-    download_ok <- !download.file(source_url, dest_path)
+    download_ok <- !download.file(source_url, dest_path,mode="wb")
     stopifnot(download_ok)
     message("Download OK")
   } else {

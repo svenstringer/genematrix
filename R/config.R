@@ -1,4 +1,5 @@
 #' @import data.table
+#' @import R.utils
 #' @importFrom stats end start
 #' @importFrom utils download.file write.table
 NULL
@@ -19,10 +20,11 @@ gm_settings <- list(gencode_version = gencode_version,  #v24 used in UCSC browse
                   gwascatalog_url = "https://www.ebi.ac.uk/gwas/api/search/downloads/alternative",
                   omim_url = "http://omim.org/static/omim/data/mim2gene.txt",
                   sumstats_dir = "./sumstats",
+                  cache_dir = cache_dir,
                   gtt_path = file.path(cache_dir,"gene_symbol_table.Rdata"),
                   core_path = file.path(cache_dir,"core_matrix.Rdata"),
                   value_sep = "//",
                   add_excel_collisions = T,
                   annotations = c("exacpli", "omim", "gwascatalog", "genebasedp","expression"),
-                  gmversion = 0.1,
+                  gmversion = 1,
                   gene_bp_dif = 5e+05)

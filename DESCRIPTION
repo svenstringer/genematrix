@@ -16,7 +16,7 @@ Depends:
     R (>= 3.3.1)
 Imports:
     data.table,
-    utils, stats
+    utils, stats, R.utils
 License: None
 Encoding: UTF-8
 LazyData: true

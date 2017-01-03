@@ -1,19 +1,25 @@
+#' Standardize gene names to upper case and remove punctuations (other than .)
+#' @param genenames vector of genenames
+#' @return a vector of sanitized gene names (capital letters, most punctuations removed)
 uniform_genenames <- function(genenames) {
     unif_symbols <- toupper(genenames)
     unif_symbols <- gsub("[^A-Z0-9\\.]", "", unif_symbols)
     return(unif_symbols)
 }
 
-
 #' Load gene name translation table and create if it does not exist
+#' @param core_matrix data.frame with core matrix
+#' @settings list with global settings
+#' @return data.frame with gene_translation_table
 #' @export
-get_symbol_table <- function(core_matrix, settings, excel_col=settings$add_excel_collisions) {
-  if(file.exists(settings$core_path)){
+get_symbol_table <- function(core_matrix, settings) {
+  if(file.exists(settings$gtt_path)){
     load(settings$gtt_path)
   }else{
-    gene_translation_table <- create_symbol_table(core_matrix,settings$value_sep,excel_col)
+    gene_translation_table <- create_symbol_table(core_matrix,settings$value_sep,settings$add_excel_collisions)
     save(gene_translation_table,file=settings$gtt_path)
   }
+  return(gene_translation_table)
 }
 
 #' Create gene symbol translation table

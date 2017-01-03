@@ -4,7 +4,7 @@
 \name{gm_settings}
 \alias{gm_settings}
 \title{Global settings available after loading GeneMatrix package}
-\format{An object of class \code{list} of length 16.}
+\format{An object of class \code{list} of length 17.}
 \usage{
 gm_settings
 }

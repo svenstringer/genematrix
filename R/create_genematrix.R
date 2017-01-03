@@ -10,16 +10,16 @@
 #' @export
 generate_genematrix <- function(settings=gm_settings){
 
-stopifnot(c("gencode_version","cache_dir") %in% settings )
+stopifnot(c("gencode_version","cache_dir") %in% names(settings) )
 
 #If no gene_matrix_path is found in settings list a default filename is save in the current working directory.
-if(! gene_matrix_path %in% names(settings) ){
+if(! "gene_matrix_path" %in% names(settings) ){
   gene_matrix_file <- paste0("genematrix_core_gencode", settings$gencode_version, "_", Sys.Date(), ".csv")
   gene_matrix_path <- file.path(getwd(), gene_matrix_file)
 }
 
-create_dir(cache_dir)
-check_path(cache_dir)
+create_dir(settings$cache_dir)
+check_path(settings$cache_dir)
 
 message("Gene matrix file will be saved as: ", gene_matrix_path)
 
@@ -41,7 +41,6 @@ message("Gene matrix saved as ", gene_matrix_path)
 }
 
 
-
 #' Add annotations to core gene matrix
 #'
 #' Adds several types of gene annotation to the core matrix, such as constraint scores,
@@ -57,8 +56,16 @@ add_annotations <- function(core, gene_translation_table,settings) {
   gene_matrix <- core
 
   # Add pli scores from exac
-  gene_matrix <- merge_exacpli(settings$fullexacpli_url, gene_matrix, gene_translation_table, settings$gene_bp_dif)
-  gene_matrix <- merge_exacpli(settings$nonpsychexacpli_url, gene_matrix, gene_translation_table, settings$gene_bp_dif)
+  gene_matrix <- merge_exacpli("fullexac", gene_matrix, gene_translation_table, settings)
+  gene_matrix <- merge_exacpli("nonpsychexac", gene_matrix, gene_translation_table, settings)
+
+  #Add ommim
+
+  #Add gwas catalog
+
+  #Add brain expression
+
+  #Add gene-based p-values
 
   return(gene_matrix)
 }
