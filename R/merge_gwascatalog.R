@@ -11,7 +11,6 @@ process_gwascatalog <- function(settings=gm_settings) {
 
   col_selection <- c("PUBMEDID", "DATE","STUDY","DISEASE/TRAIT","")
 
-
   #pmid date type trait snpid allele_increasing_risk frequn pval OR_beta maybeOR Ninitial Nrep;
 
   gc_path <- file.path(settings$cache_dir, "gwascatalog_alternative.txt")
@@ -22,6 +21,8 @@ process_gwascatalog <- function(settings=gm_settings) {
 
   gwcatalog <- fread(gc_path,colClasses=list(character=c("P-VALUE","CHR_ID")))
 
+  gwcatalog[,chr := CHR_ID]
+  gwcatalog[,pos := CHR_POS]
   stopifnot(all(col_selection %in% names(gwcatalog)))
   pli <- pli[, col_selection, with = F]
   return(pli)
@@ -94,8 +95,6 @@ merge_gwascatalog <- function(pli_suffix, gene_matrix, gene_translation_table, s
   message(n_matches, " genes out of ", nrow(final_df), " are uniquely matched to genes in pli_", pli_suffix, " data")
 
   final_df[, c("gene", "chr_pli", "cds_start") := NULL]
-
-
 
   # Rename
   old_names <- c("transcript", "pLI", "pRec", "pNull")

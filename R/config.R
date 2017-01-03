@@ -6,6 +6,7 @@ NULL
 
 gencode_version <- 24
 cache_dir <- "./datacache"
+magma_dir <- "./magma"
 
 #' Global settings available after loading GeneMatrix package
 #' @export
@@ -27,4 +28,12 @@ gm_settings <- list(gencode_version = gencode_version,  #v24 used in UCSC browse
                   add_excel_collisions = T,
                   annotations = c("exacpli", "omim", "gwascatalog", "genebasedp","expression"),
                   gmversion = 1,
-                  gene_bp_dif = 5e+05)
+                  gene_bp_dif = 5e+05,
+                  snp_gene_bp_dif = 25000,
+                  magma_dir = magma_dir,
+                  magma_executable <- file.path(magma_dir,"magma_v1.05b_static/magma"),
+                  magma_ref_file <- file.path(magma_dir,"magma_v1.05b_static/g1000_eur/g1000_eur"),
+                  magma_geneloc_file <- file.path(magma_dir,"magma_gencode_geneloc.txt"),
+                  magma_gene_prefix <- file.path(magma_dir,"magma_igap"),
+                  magma_annot_prefix <- file.path(magma_dir,"magma_gencode")
+                 )
