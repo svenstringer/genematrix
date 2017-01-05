@@ -1,3 +1,13 @@
+ <- function(settings=gm_settings)
+
+compute_genebasedp <- function(settings=gm_settings){
+     message("Merge genebased p")
+}
+
+merge_genebasedp <- function(settings=gm_settings){
+  message("Merge genebased p")
+}
+
 # MAGMA analysis example on ADNI
 # magma_executable <- "./magma_v1.05b_static/magma"
 # summary_file <- "./IGAP_base_stage1_stats.txt"  #'/home/sven/lisa/ctgukbio/datasets/adni/qc/final/IGAP_base_stage1_stats.txt'
