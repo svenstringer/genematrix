@@ -65,7 +65,6 @@ install_magma <- function(settings=gm_settings){
     }
 }
 
-create_magma_
 
 
 

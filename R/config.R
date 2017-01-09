@@ -10,7 +10,7 @@ cache_dir <- file.path(getwd(),"datacache")
 magma_dir <- file.path(getwd(),"magma")
 sumstats_dir <- file.path(getwd(),"sumstats")
 magma_ref_url <- "http://ctg.cncr.nl/software/MAGMA/ref_data/g1000_eur.zip"
-magma_osversion<- get_magma_osversion()
+magma_osversion <- get_magma_osversion()
 
 #' Global settings available after loading GeneMatrix package
 #' @export
