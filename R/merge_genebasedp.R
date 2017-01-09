@@ -1,4 +1,4 @@
- <- function(settings=gm_settings)
+# <- function(settings=gm_settings)
 
 compute_genebasedp <- function(settings=gm_settings){
      message("Merge genebased p")
