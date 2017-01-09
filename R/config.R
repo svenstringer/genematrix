@@ -17,9 +17,9 @@ get_magma_osversion <- function(){
 
 gencode_version <- 24
 magma_version <- "1.06"
-cache_dir <- file.path(getwd(),"datacache")
-magma_dir <- file.path(getwd(),"magma")
-sumstats_dir <- file.path(getwd(),"sumstats")
+cache_dir <- file.path(".","datacache")
+magma_dir <- file.path(".","magma")
+sumstats_dir <- file.path(".","sumstats")
 magma_ref_url <- "http://ctg.cncr.nl/software/MAGMA/ref_data/g1000_eur.zip"
 
 magma_osversion <- get_magma_osversion()
