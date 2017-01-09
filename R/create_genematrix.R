@@ -31,10 +31,12 @@ gene_translation_table <- get_symbol_table(core,  settings)
 
 
 # Add custom annotation to create final gene matrix
+message("Add annotations...")
 gene_matrix <- add_annotations(core, gene_translation_table, settings)
 
 #Save specified columns to final output
-publish_genematrix(gene_matrix, settings)
+message("Save gene matrix to file...")
+publish_genematrix(gene_matrix, gene_matrix_path)
 
 message("Gene matrix saved as ", gene_matrix_path)
 
