@@ -20,6 +20,7 @@ download_source <- function(source_url, dest_path) {
 }
 
 #' Get compiled magma platform version to download: windows (win), mac (mac osx), static (linux fully static )
+#' @export
 get_magma_osversion <- function(){
   os <- Sys.info()[["sysname"]]
   return(switch(os,
