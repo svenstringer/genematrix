@@ -4,12 +4,24 @@
 #' @importFrom utils download.file write.table
 NULL
 
+#' Get compiled magma platform version to download: windows (win), mac (mac osx), static (linux fully static )
+#' @export
+get_magma_osversion <- function(){
+  os <- Sys.info()[["sysname"]]
+  return(switch(os,
+                Windows="win",
+                Darwin="mac",
+                Linux="static"))
+}
+
+
 gencode_version <- 24
 magma_version <- "1.06"
 cache_dir <- file.path(getwd(),"datacache")
 magma_dir <- file.path(getwd(),"magma")
 sumstats_dir <- file.path(getwd(),"sumstats")
 magma_ref_url <- "http://ctg.cncr.nl/software/MAGMA/ref_data/g1000_eur.zip"
+
 magma_osversion <- get_magma_osversion()
 
 #' Global settings available after loading GeneMatrix package
