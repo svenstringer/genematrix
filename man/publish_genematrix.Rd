@@ -4,7 +4,8 @@
 \alias{publish_genematrix}
 \title{Save customized gene matrix based on settings}
 \usage{
-publish_genematrix(gene_matrix, gene_matrix_path)
+publish_genematrix(gene_matrix, gene_matrix_path,
+  output_cols = gm_settings$output_colnames)
 }
 \arguments{
 \item{gene_matrix}{a data.table with gene annotation to save}
@@ -15,6 +16,6 @@ publish_genematrix(gene_matrix, gene_matrix_path)
 None
 }
 \description{
-Publish gene matrix in .csv format including user-set columns
+Publish gene matrix in .csv and .Rdata format
 }
 

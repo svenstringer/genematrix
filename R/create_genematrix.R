@@ -13,9 +13,9 @@ generate_genematrix <- function(settings=gm_settings){
 stopifnot(c("gencode_version","cache_dir") %in% names(settings) )
 
 #If no gene_matrix_path is found in settings list a default filename is save in the current working directory.
-if(! "gene_matrix_path" %in% names(settings) ){
-  gene_matrix_file <- paste0("genematrix_core_gencode", settings$gencode_version, "_", Sys.Date(), ".csv")
-  gene_matrix_path <- file.path(getwd(), gene_matrix_file)
+if(! "gene_matrix_prefix" %in% names(settings) ){
+  gene_matrix_prefix <- paste0("genematrix_core_gencode", settings$gencode_version, "_", Sys.Date())
+  gene_matrix_path <- file.path(getwd(), gene_matrix_prefix)
 }
 
 create_dir(settings$cache_dir)
@@ -29,17 +29,15 @@ core <- get_core_matrix(settings)
 # Create mapping from alias to official gene symbols
 gene_translation_table <- get_symbol_table(core,  settings)
 
-
 # Add custom annotation to create final gene matrix
 message("Add annotations...")
 gene_matrix <- add_annotations(core, gene_translation_table, settings)
 
 #Save specified columns to final output
 message("Save gene matrix to file...")
-publish_genematrix(gene_matrix, gene_matrix_path)
+publish_genematrix(gene_matrix, gene_matrix_prefix)
 
-message("Gene matrix saved as ", gene_matrix_path)
-
+message("Gene matrix saved as ", gene_matrix_prefix)
 }
 
 
@@ -55,7 +53,16 @@ message("Gene matrix saved as ", gene_matrix_path)
 #'
 #' @export
 add_annotations <- function(core, gene_translation_table,settings) {
-  gene_matrix <- core
+
+  if(is.null(settings$output_cols)){
+    gene_matrix <- core
+  } else {
+    gene_matrix <- core[,settings$output_cols,with=F]
+  }
+
+
+  #restrict columns in core matrix
+
 
   # Add pli scores from exac
   gene_matrix <- merge_exacpli("fullexac", gene_matrix, gene_translation_table, settings)
@@ -75,7 +82,7 @@ add_annotations <- function(core, gene_translation_table,settings) {
 
 #' Save customized gene matrix based on settings
 #'
-#' Publish gene matrix in .csv format including user-set columns
+#' Publish gene matrix in .csv and .Rdata format
 #'
 #' @param gene_matrix a data.table with gene annotation to save
 #' @param settings a list including which columns to save and destination path
@@ -83,12 +90,12 @@ add_annotations <- function(core, gene_translation_table,settings) {
 #' @return None
 #'
 #' @export
-publish_genematrix <- function(gene_matrix, gene_matrix_path) {
-  output_cols <- c('chr','chr_name','chr_plink','start','end','symbol','aliases','strand','merge_trial','tag','source','feature','remap_status','hgnc_id')
-  output_df <- gene_matrix[,output_cols,with=F]
-  write.table(output_df,file=gene_matrix_path,quote=T,sep='\t',row.names=F)
+publish_genematrix <- function(gene_matrix, gene_matrix_prefix,output_cols=gm_settings$output_colnames) {
 
-  message("Publish gene matrix")
+  write.table(gene_matrix,file=paste0(gene_matrix_prefix,".csv"),quote=T,sep='\t',row.names=F)
+  save(gene_matrix,file=paste0(gene_matrix_prefix,".Rdata"))
+
+  message("Gene matrix saved")
 }
 
 

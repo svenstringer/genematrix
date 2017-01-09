@@ -17,6 +17,9 @@ create_core_matrix(gencode_url, hgnc_url, entrez_url, value_sep, download_dir)
 
 \item{download_dir}{directory to save gencode, hgnc, and entrez source files.}
 }
+\value{
+a data.table with core gene matrix
+}
 \description{
 Gene definitions are based on gencode. Entrez ids and official hgnc symbols are merged in
 Gene symbols in the resulting file are unique and only contains gencode genes that could be

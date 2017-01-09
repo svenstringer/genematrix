@@ -4,8 +4,8 @@
 \alias{merge_exacpli}
 \title{Merge exac pli constraint data into gene matrix}
 \usage{
-merge_exacpli(pli_url, gene_matrix, gene_translation_table,
-  gene_bp_dif = 5e+05)
+merge_exacpli(pli_suffix, gene_matrix, gene_translation_table,
+  settings = gm_settings)
 }
 \description{
 Merge exac pli constraint data into gene matrix

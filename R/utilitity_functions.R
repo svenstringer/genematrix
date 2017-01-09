@@ -21,6 +21,7 @@ download_source <- function(source_url, dest_path) {
 
 
 #' Install stand-alone magma if not available yet
+#' @export
 install_magma <- function(settings=gm_settings){
 
   stopifnot( c("magma_url","magma_dir","magma_executable") %in%  names(settings))
@@ -55,6 +56,41 @@ install_magma <- function(settings=gm_settings){
     stopifnot(file.exists(paste0(magma_ref_prefix,".bim")))
     stopifnot(file.exists(paste0(magma_ref_prefix,".fam")))
     }
+}
+
+#' Install stand-alone magma if not available yet
+annotate_magma <- function(settings=gm_settings){
+
+  stopifnot( c("magma_ref_prefix","magma_dir","magma_executable") %in%  names(settings))
+
+  magma_ref_prefix <- settings$magma_ref_prefix
+  magma_executable <- settings$magma_executable
+
+  if(!file.exists(magma_executable)){install_magma(settings)}
+
+  # Create snploc to rsid map
+  snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
+  setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
+  snpmap[, `:=`(snpid, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+
+  # Create a gene loc
+  magma_geneloc <- core[, c("entrez_id", "chr", "start", "end", "strand"), with = F]
+  write.table(magma_geneloc, file = magma_geneloc_file, sep = " ", quote = F, row.names = F, col.names = F)
+
+  # Code is format summary data (summaryfile SPECIFIC!!)
+  df <- fread(summary_file, select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
+  df[, `:=`(snpid, paste0(CHR, ":", BP, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+
+  df2 <- merge(df, snpmap, by.x = c("snpid", "CHR", "BP"), by.y = c("snpid", "CHR", "POS"), suffixes = c("", ".snpmap"))
+  setnames(df2, "SNP", "SNP2")
+  setnames(df2, "SNP.snpmap", "SNP")
+
+  write.table(df2[, .(SNP, CHR, BP, P, A1, A2)], file = magma_summary_file, sep = " ", quote = F, row.names = F, col.names = T)
+
+  #Annotation magma
+  cmd <- paste0(magma_executable, " --annotate --snp-loc ", magma_summary_file, " --gene-loc ", magma_geneloc_file,
+                " --out ", magma_annot_prefix)
+  system(cmd)
 }
 
 

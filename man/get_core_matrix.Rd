@@ -9,7 +9,10 @@ get_core_matrix(settings = gm_settings)
 \arguments{
 \item{settings}{list with settings (defaults to global genematrix settings gm_settings)}
 }
+\value{
+data.table with core gene matrix
+}
 \description{
-A wrapper around \code{create_core_matrix()}
+A cache wrapper around \code{create_core_matrix()}
 }
 

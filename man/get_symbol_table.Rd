@@ -4,8 +4,15 @@
 \alias{get_symbol_table}
 \title{Load gene name translation table and create if it does not exist}
 \usage{
-get_symbol_table(core_matrix, settings,
-  excel_col = settings$add_excel_collisions)
+get_symbol_table(core_matrix, settings)
+}
+\arguments{
+\item{core_matrix}{data.frame with core matrix}
+
+\item{settings}{list with global settings}
+}
+\value{
+a data.frame with gene_translation_table
 }
 \description{
 Load gene name translation table and create if it does not exist

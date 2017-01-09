@@ -9,8 +9,8 @@ uniform_genenames <- function(genenames) {
 
 #' Load gene name translation table and create if it does not exist
 #' @param core_matrix data.frame with core matrix
-#' @settings list with global settings
-#' @return data.frame with gene_translation_table
+#' @param settings list with global settings
+#' @return a data.frame with gene_translation_table
 #' @export
 get_symbol_table <- function(core_matrix, settings) {
   if(file.exists(settings$gtt_path)){

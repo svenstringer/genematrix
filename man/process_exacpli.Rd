@@ -2,11 +2,11 @@
 % Please edit documentation in R/merge_exacpli.R
 \name{process_exacpli}
 \alias{process_exacpli}
-\title{Process an online exac pli constraint file}
+\title{Process exac pli constraint file}
 \usage{
-process_exacpli(pli_url)
+process_exacpli(pli_suffix, settings = gm_settings)
 }
 \description{
-Process an online exac pli constraint file
+Process exac pli constraint file
 }
 
