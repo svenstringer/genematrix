@@ -40,7 +40,7 @@ process_gencodefile <- function(gencode_path) {
     message("Filter gencode file on feature type == 'gene' and status KNOWN...")
 
     #
-    #gencode <- fread(paste("zcat", gencode_path, "| awk '$3 == \"gene\" {print $0}' - | grep KNOWN"))
+    #gencode <- fread(paste("gunzip -c", gencode_path, "| awk '$3 == \"gene\" {print $0}' - | grep KNOWN"))
     if(.Platform$OS.type=="windows"){
       unzip_name <- substr(gencode_path,0,nchar(gencode_path)-3)
       if(!file.exists(unzip_name)) gunzip(gencode_path,remove=F)
