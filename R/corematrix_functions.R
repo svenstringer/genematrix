@@ -46,7 +46,7 @@ process_gencodefile <- function(gencode_path) {
       if(!file.exists(unzip_name)) gunzip(gencode_path,remove=F)
       gencode <- fread(unzip_name)
     }else{
-      gencode <- fread(paste(gencode_path, " < zcat | awk '$3 == \"gene\" {print $0}' - | grep KNOWN"))
+      gencode <- fread(paste("gunzip -c", gencode_path, "| awk '$3 == \"gene\" {print $0}' - | grep KNOWN"))
     }
 
     names(gencode) <- c("chr", "source", "feature", "start", "end", "score", "strand", "phase", "info")
