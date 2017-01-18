@@ -230,7 +230,7 @@ process_entrezfile <- function(entrez_path, value_sep) {
       if(!file.exists(unzip_name)) gunzip(entrez_path,remove=F)
       entrez <- fread(unzip_name)
     }else{
-      entrez <- fread(paste("zcat", entrez_path))
+      entrez <- fread(paste("gunzip -c", entrez_path))
     }
 
     old_columns <- c("GeneID", "Symbol", "Synonyms", "dbXrefs", "chromosome", "map_location",
