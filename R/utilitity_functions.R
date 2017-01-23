@@ -61,7 +61,7 @@ install_magma <- function(settings=gm_settings){
 #' @param settings list with magma installation settings
 #'
 #' @export
-annotate_magma <- function(settings=gm_settings){
+annotate_magma <- function(gene_matrix,settings=gm_settings){
 
   stopifnot( c("magma_ref_prefix","magma_dir","magma_executable") %in%  names(settings))
 
@@ -76,7 +76,7 @@ annotate_magma <- function(settings=gm_settings){
   snpmap[, `:=`(snpid, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
 
   # Create a gene loc
-  magma_geneloc <- core[, c("entrez_id", "chr", "start", "end", "strand"), with = F]
+  magma_geneloc <- gene_matrix[, c("entrez_id", "chr", "start", "end", "strand"), with = F]
   write.table(magma_geneloc, file = magma_geneloc_file, sep = " ", quote = F, row.names = F, col.names = F)
 
   # Code is format summary data (summaryfile SPECIFIC!!)

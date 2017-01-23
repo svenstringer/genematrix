@@ -1,7 +1,7 @@
-
+# The program cant start because libgcc_s_seh-1.dll is missing from your computer. Tyr reinstalling the program to fix thsi problem.
 merge_genebasedpvalues <- function(gene_matrix,gene_translation_table,settings=gm_settings){
 
-  annotate_magma(settings=settings)
+  annotate_magma(gene_matrix,settings=settings)
 
 }
 
