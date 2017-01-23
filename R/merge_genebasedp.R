@@ -1,7 +1,64 @@
-# <- function(settings=gm_settings)
 
-compute_genebasedp <- function(settings=gm_settings){
-     message("Merge genebased p")
+merge_genebasedpvalues <- function(gene_matrix,gene_translation_table,settings=gm_settings){
+
+  annotate_magma(settings=settings)
+
+}
+
+
+#' Compute gene-based pvalue based on daner summary stats file
+#'
+#' @param settings a list containing all
+#'
+#' @return Data table with one p-value per gene
+#'
+#' @export
+compute_genebasedp <- function(summary_file=NULL,output_prefix=NULL,annot_prefix=NULL,ref_file=NULL,magma_executable=NULL){
+
+  #Check if magma executable exists, if not install
+  if(is.null(magma_executable)){
+    stopifnot(!is.null(gm_settings$magma_executable))
+    magma_executable <- gm_settings$magma_executable
+    if(!file.exists(magma_executable))
+    {
+
+    }
+  }
+
+
+  if(is.null(summary_file)){
+    stopifnot(!is.null(gm_settings$example_sumstat_path))
+    summary_file <- gm_settings$example_sumstat_path
+  }
+  stopifnot(startsWith(basename(summary_file),"daner_"))
+
+  if(is.null(output_prefix)) output_prefix <- file.path(gm_settings$cache_dir,strsplit(basename(summary_file),split="_")[[1]][2])
+  if(is.null(ref_file)){
+    stopifnot(!is.null(gm_settings$magma_ref_prefix))
+    ref_file <- gm_settings$magma_ref_prefix
+  }
+  if(is.null(annot_prefix)){
+    stopifnot(!is.null(gm_settings$magma_annot_prefix))
+    ref_file <- gm_settings$magma_annot_prefix
+  }
+
+
+
+  stopifnot(file.exists(ref_file))
+  stopifnot(file.exists(summary_file))
+  stopifnot(file.exists(annot_prefix))
+
+  message("Compute genebased p-value with MAGMA")
+  #N is irrelevant for outcome in this magma analysis, set arbitrary
+  N<-10000
+  cmd <- paste0(magma_executable, " --bfile ", ref_file, " --pval ", summary_file, " N=",N," --gene-model multi --gene-annot ",
+                annot_prefix, ".genes.annot --out ", output_prefix)
+  system(cmd)
+
+  genes <- fread(paste0(output_prefix, ".genes.out"))
+
+  setorder(genes, P, ZSTAT)
+  genes
 }
 
 merge_genebasedp <- function(settings=gm_settings){
@@ -51,13 +108,3 @@ merge_genebasedp <- function(settings=gm_settings){
 # system(cmd)
 #
 # # based on min z-value in gene
-# cmd <- paste0(magma_executable, " --bfile ", magma_ref_file, " --pval ", magma_summary_file, " N=74046 --gene-model multi --gene-annot ",
-#               magma_annot_prefix, ".genes.annot --out ", magma_gene_prefix)
-# system(cmd)
-#
-# magma_gene_prefix <- "magma_igap"
-#
-# genes <- fread(paste0(magma_gene_prefix, ".genes.out"))
-#
-# setorder(genes, P, ZSTAT)
-# genes

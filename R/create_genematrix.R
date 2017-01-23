@@ -75,6 +75,7 @@ add_annotations <- function(core, gene_translation_table,settings) {
   #Add brain expression
 
   #Add gene-based p-values
+  #gene_matrix <- merge_genebasedpvalues(gene_matrix,gene_translation_table,settings)
 
   return(gene_matrix)
 }

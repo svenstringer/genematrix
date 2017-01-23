@@ -21,13 +21,12 @@ download_source <- function(source_url, dest_path) {
 
 
 #' Install stand-alone magma if not available yet
-#' @export
 install_magma <- function(settings=gm_settings){
 
   stopifnot( c("magma_url","magma_dir","magma_executable") %in%  names(settings))
 
   magma_url <- settings$magma_url
-  magmaref_url <- settings$magma_ref_url
+  magma_ref_url <- settings$magma_ref_url
   magma_dir <- settings$magma_dir
   magma_ref_prefix <- settings$magma_ref_prefix
 
@@ -42,7 +41,7 @@ install_magma <- function(settings=gm_settings){
     stopifnot(download_ok)
     message("Download OK")
     unzip(magmazip_path,exdir=magma_dir)
-    stopifnot(!file.exists(settings$magma_executable))
+    stopifnot(file.exists(settings$magma_executable))
   }
 
   #Download magma 1000 genomes reference
@@ -58,7 +57,10 @@ install_magma <- function(settings=gm_settings){
     }
 }
 
-#' Install stand-alone magma if not available yet
+#' Create gene annotation file for MAGMA (and install MAGMA if not available)
+#' @param settings list with magma installation settings
+#'
+#' @export
 annotate_magma <- function(settings=gm_settings){
 
   stopifnot( c("magma_ref_prefix","magma_dir","magma_executable") %in%  names(settings))
