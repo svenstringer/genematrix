@@ -78,7 +78,7 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
   snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
   setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
   snpmap[, `:=`(SNP, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
-  write.table(snpmap[, .(SNP, CHR, BP, A1, A2)],file=magma_snpmap_file,quote=F,row.names=F,col.names=T,sep=" ")
+  write.table(snpmap[, .(SNP, CHR, POS)],file=magma_snpmap_file,quote=F,row.names=F,col.names=T,sep=" ")
   }
 
   # Create a gene loc
