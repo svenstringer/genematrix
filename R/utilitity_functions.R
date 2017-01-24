@@ -67,19 +67,23 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
 
   magma_ref_prefix <- settings$magma_ref_prefix
   magma_executable <- settings$magma_executable
+  magma_geneloc_file <- settings$magma_geneloc_file
 
   if(!file.exists(magma_executable)){install_magma(settings)}
 
   # Create snploc to rsid map
+  message("Map SNP location to SNPid...")
   snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
   setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
   snpmap[, `:=`(snpid, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
 
   # Create a gene loc
+  message("Create a magma gene location file from core matrix...")
   magma_geneloc <- gene_matrix[, c("entrez_id", "chr", "start", "end", "strand"), with = F]
   write.table(magma_geneloc, file = magma_geneloc_file, sep = " ", quote = F, row.names = F, col.names = F)
 
-  # Code is format summary data (summaryfile SPECIFIC!!)
+  # Code is format summary data SPECIFIC!!
+  message("")
   df <- fread(summary_file, select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
   df[, `:=`(snpid, paste0(CHR, ":", BP, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
 
