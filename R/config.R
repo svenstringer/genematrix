@@ -52,7 +52,7 @@ gm_settings <- list(gencode_version = gencode_version,  #v24 used in UCSC browse
                   gene_bp_dif = 5e+05,
                   snp_gene_bp_dif = 25000,
                   magma_dir = magma_dir,
-                  magma_executable = file.path(magma_dir,ifelse(magma_osversion=="win","magma.exe","magma")),
+                  magma_executable = file.path(magma_dir,ifelse(magma_osversion=="win_static","magma.exe","magma")),
                   magma_ref_prefix = file.path(magma_dir,substr(basename(magma_ref_url),0,nchar(basename(magma_ref_url))-4)),
                   magma_geneloc_file = file.path(magma_dir,"magma_gencode_geneloc.txt"),
                   magma_annot_prefix = file.path(magma_dir,"magma_gencode"),

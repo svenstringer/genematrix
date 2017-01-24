@@ -2,11 +2,14 @@
 % Please edit documentation in R/utilitity_functions.R
 \name{annotate_magma}
 \alias{annotate_magma}
-\title{Install stand-alone magma if not available yet}
+\title{Create gene annotation file for MAGMA (and install MAGMA if not available)}
 \usage{
-annotate_magma(settings = gm_settings)
+annotate_magma(gene_matrix, settings = gm_settings)
+}
+\arguments{
+\item{settings}{list with magma installation settings}
 }
 \description{
-Install stand-alone magma if not available yet
+Create gene annotation file for MAGMA (and install MAGMA if not available)
 }
 

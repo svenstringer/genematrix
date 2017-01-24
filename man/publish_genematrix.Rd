@@ -4,7 +4,7 @@
 \alias{publish_genematrix}
 \title{Save customized gene matrix based on settings}
 \usage{
-publish_genematrix(gene_matrix, gene_matrix_path,
+publish_genematrix(gene_matrix, gene_matrix_prefix,
   output_cols = gm_settings$output_colnames)
 }
 \arguments{
