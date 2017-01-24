@@ -9,7 +9,7 @@ NULL
 get_magma_osversion <- function(){
   os <- Sys.info()[["sysname"]]
   return(switch(os,
-                Windows="win",
+                Windows="win_static",
                 Darwin="mac",
                 Linux="static"))
 }
