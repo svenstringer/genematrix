@@ -74,6 +74,12 @@ merge_genebasedp <- function(settings=gm_settings){
 # magma_gene_prefix <- "./magma_igap"
 # magma_annot_prefix <- "./magma_gencode"
 #
+#DAner file HEADER (snp IS RS ID)
+#CHR     SNP     BP      A1      A2      FRQ_A_33640     FRQ_U_43456     INFO    OR      SE      P       ngt     Direction       HetISqt HetChiSq        HetDf   HetPVa
+
+
+
+
 #
 # output_prefix <- "gencode"
 #
@@ -108,3 +114,18 @@ merge_genebasedp <- function(settings=gm_settings){
 # system(cmd)
 #
 # # based on min z-value in gene
+
+
+
+
+
+# Code is format summary data SPECIFIC!!
+#message("Merge summary file info with magma snpmap")
+#df <- fread(summary_file, select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
+#df[, `:=`(snpid, paste0(CHR, ":", BP, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+
+##df2 <- merge(df, snpmap, by.x = c("snpid", "CHR", "BP"), by.y = c("snpid", "CHR", "POS"), suffixes = c("", ".snpmap"))
+#setnames(df2, "SNP", "SNP2")
+#setnames(df2, "SNP.snpmap", "SNP")
+
+#write.table(df2[, .(SNP, CHR, BP, P, A1, A2)], file = magma_summary_file, sep = " ", quote = F, row.names = F, col.names = T)

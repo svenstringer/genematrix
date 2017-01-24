@@ -68,39 +68,34 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
   magma_ref_prefix <- settings$magma_ref_prefix
   magma_executable <- settings$magma_executable
   magma_geneloc_file <- settings$magma_geneloc_file
+  magma_snpmap_file <- settings$magma_snpmap_file
 
   if(!file.exists(magma_executable)){install_magma(settings)}
 
-  # Create snploc to rsid map
-  message("Map SNP location to SNPid...")
+  # Create snploc  map
+  if(!file.exists(magma_snpmap_file)){
+  message("Create magma SNP location map...")
   snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
   setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
-  snpmap[, `:=`(snpid, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+  snpmap[, `:=`(SNP, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+  write.table(snpmap[, .(SNP, CHR, BP, A1, A2)],file=magma_snpmap_file,quote=F,row.names=F,col.names=T,sep=" ")
+  }
 
   # Create a gene loc
+  if(!file.exists(magma_geneloc_file)){
   message("Create a magma gene location file from core matrix...")
   magma_geneloc <- gene_matrix[, c("entrez_id", "chr", "start", "end", "strand"), with = F]
   write.table(magma_geneloc, file = magma_geneloc_file, sep = " ", quote = F, row.names = F, col.names = F)
+  }
 
-  # Code is format summary data SPECIFIC!!
-  message("")
-  df <- fread(summary_file, select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
-  df[, `:=`(snpid, paste0(CHR, ":", BP, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
-
-  df2 <- merge(df, snpmap, by.x = c("snpid", "CHR", "BP"), by.y = c("snpid", "CHR", "POS"), suffixes = c("", ".snpmap"))
-  setnames(df2, "SNP", "SNP2")
-  setnames(df2, "SNP.snpmap", "SNP")
-
-  write.table(df2[, .(SNP, CHR, BP, P, A1, A2)], file = magma_summary_file, sep = " ", quote = F, row.names = F, col.names = T)
-
-  #Annotation magma
-  cmd <- paste0(magma_executable, " --annotate --snp-loc ", magma_summary_file, " --gene-loc ", magma_geneloc_file,
+  #Annotate genes
+  if(!file.exists(paste0(magma_annot_prefix,".genes.annot"))){
+  message("Map snps to genes")
+  cmd <- paste0(magma_executable, " --annotate --snp-loc ", magma_snpmap_file, " --gene-loc ", magma_geneloc_file,
                 " --out ", magma_annot_prefix)
   system(cmd)
+  }
 }
-
-
-
 
 #' Create directory if it does not exist
 #'
