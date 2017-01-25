@@ -18,7 +18,10 @@ if(length(sum_files)==0){
 }
 
 for(f in sum_files){
-  compute_genebased_p(f)
+  output_prefix <- file.path(gm_settings$cache_dir,strsplit(basename(f),split="_")[[1]][2])
+  if(!file.exists(paste0(output_prefix, ".genes.out"))){
+    compute_genebased_p(f,output_prefix=output_prefix)
+  }
 }
 }
 
@@ -29,6 +32,8 @@ for(f in sum_files){
 #' @export
 merge_genebased_pvalues <- function(gene_matrix,settings=gm_settings){
 
+  compute_genebased_pvalues(settings)
+
   genep_files <- Sys.glob(file.path(settings$cache_dir,"*.genes.out"))
 
   for(f in genep_files){
@@ -36,8 +41,6 @@ merge_genebased_pvalues <- function(gene_matrix,settings=gm_settings){
   }
   res
 }
-
-
 
 
 #' Compute gene-based pvalue based on daner summary stats file
