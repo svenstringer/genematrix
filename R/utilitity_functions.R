@@ -54,7 +54,12 @@ install_magma <- function(settings=gm_settings){
     stopifnot(file.exists(paste0(magma_ref_prefix,".bed")))
     stopifnot(file.exists(paste0(magma_ref_prefix,".bim")))
     stopifnot(file.exists(paste0(magma_ref_prefix,".fam")))
-    }
+  }
+
+  #Make magma executable on linux/max
+  if (get_magma_osversion() %in% c("static","mac")){
+    system(paste0("chmod +x ",gm_settings$magma_executable))
+  }
 }
 
 #' Create gene annotation file for MAGMA (and install MAGMA if not available)
@@ -69,6 +74,7 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
   magma_executable <- settings$magma_executable
   magma_geneloc_file <- settings$magma_geneloc_file
   magma_snpmap_file <- settings$magma_snpmap_file
+  magma_annot_prefix <- settings$magma_annot_prefix
 
   if(!file.exists(magma_executable)){install_magma(settings)}
 
@@ -78,7 +84,8 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
   snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
   setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
   snpmap[, `:=`(SNP, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
-  write.table(snpmap[, .(SNP, CHR, POS)],file=magma_snpmap_file,quote=F,row.names=F,col.names=T,sep=" ")
+  snpmap <- snpmap[, .(SNP, CHR, POS)]
+  save(snpmap,file=magma_snpmap_file)
   }
 
   # Create a gene loc

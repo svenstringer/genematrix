@@ -2,6 +2,7 @@
 
 export(add_annotations)
 export(annotate_magma)
+export(compute_genebased_pvalues)
 export(compute_genebasedp)
 export(create_core_matrix)
 export(generate_genematrix)

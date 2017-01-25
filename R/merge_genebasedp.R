@@ -1,9 +1,43 @@
-# The program cant start because libgcc_s_seh-1.dll is missing from your computer. Tyr reinstalling the program to fix thsi problem.
-merge_genebasedpvalues <- function(gene_matrix,gene_translation_table,settings=gm_settings){
+#' Compute gene-based pvalue based on daner summary stats files available
+#'
+#' @param settings a list containing all magma-related settings
+#'
+#' @export
+compute_genebased_pvalues <- function(settings=gm_settings){
 
-  annotate_magma(gene_matrix,settings=settings)
+sum_files <- Sys.glob(file.path(settings$sumstats_dir,"daner_*"))
 
+#Prepare example daner file
+if(length(sum_files)==0){
+  stopifnot(!is.null(gm_settings$example_sumstat_path))
+  summary_file <- gm_settings$example_sumstat_path
+  message("Downloading example daner sumstat file...")
+  download_ok <- !download.file(gm_settings$example_sumstat_url, summary_file,mode="wb")
+  stopifnot(download_ok)
+  message("Download OK")
 }
+
+for(f in sum_files){
+  compute_genebased_p(f)
+}
+}
+
+#' Compute gene-based pvalue based on daner summary stats files available
+#'
+#' @param settings a list containing all magma-related settings
+#'
+#' @export
+merge_genebased_pvalues <- function(gene_matrix,settings=gm_settings){
+
+  genep_files <- Sys.glob(file.path(settings$cache_dir,"*.genes.out"))
+
+  for(f in genep_files){
+    res<- merge_genebased_p(gene_matrix,f)
+  }
+  res
+}
+
+
 
 
 #' Compute gene-based pvalue based on daner summary stats file
@@ -13,23 +47,9 @@ merge_genebasedpvalues <- function(gene_matrix,gene_translation_table,settings=g
 #' @return Data table with one p-value per gene
 #'
 #' @export
-compute_genebasedp <- function(summary_file=NULL,output_prefix=NULL,annot_prefix=NULL,ref_file=NULL,magma_executable=NULL){
-
-  #Check if magma executable exists, if not install
-  if(is.null(magma_executable)){
-    stopifnot(!is.null(gm_settings$magma_executable))
-    magma_executable <- gm_settings$magma_executable
-    if(!file.exists(magma_executable))
-    {
-
-    }
-  }
+compute_genebasedp <- function(summary_file=NULL,output_prefix=NULL,annot_prefix=NULL,ref_file=NULL,snpmap_file=NULL,magma_executable=NULL){
 
 
-  if(is.null(summary_file)){
-    stopifnot(!is.null(gm_settings$example_sumstat_path))
-    summary_file <- gm_settings$example_sumstat_path
-  }
   stopifnot(startsWith(basename(summary_file),"daner_"))
 
   if(is.null(output_prefix)) output_prefix <- file.path(gm_settings$cache_dir,strsplit(basename(summary_file),split="_")[[1]][2])
@@ -39,19 +59,48 @@ compute_genebasedp <- function(summary_file=NULL,output_prefix=NULL,annot_prefix
   }
   if(is.null(annot_prefix)){
     stopifnot(!is.null(gm_settings$magma_annot_prefix))
-    ref_file <- gm_settings$magma_annot_prefix
+    annot_prefix <- gm_settings$magma_annot_prefix
+  }
+  if(is.null(snpmap_file)){
+    stopifnot(!is.null(gm_settings$magma_snpmap_file))
+    snpmap_file <- gm_settings$magma_snpmap_file
+  }
+  if(is.null(magma_executable)){
+    stopifnot(!is.null(gm_settings$magma_executable))
+    magma_executable <- gm_settings$magma_executable
   }
 
+  snpmap <- load(snpmap_file)
+  magma_sum_file <- paste0(f,".magma")
+  if(endsWith(f,".gz")){
+    unzip_name <- substr(f,0,nchar(f)-3)
+    if(get_magma_osversion() == "win_static"){
+      if(!file.exists(unzip_name)) gunzip(f,remove=F)
+      df <- fread(unzip_name,select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
+    }else{
+      df <- fread(paste0("gunzip -c ",f),select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
+    }
+  }else{
+    df <- fread(f,select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
+  }
+  setnames(df,old=colnames(df),new=c("SNP", "CHR", "POS", "P", "A1", "A2"))
 
+  df[, `:=`(SNP, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+  df <- merge(snpmap,df,by=c("SNP","CHR","POS"))
 
-  stopifnot(file.exists(ref_file))
-  stopifnot(file.exists(summary_file))
-  stopifnot(file.exists(annot_prefix))
+  write.table(df[,.(SNP,CHR,POS,P)],file=magma_sum_file, sep = " ", quote = F, row.names = F, col.names = T)
+
+  stopifnot(file.exists(paste0(ref_file,".bim")))
+  stopifnot(file.exists(paste0(ref_file,".bed")))
+  stopifnot(file.exists(paste0(ref_file,".fam")))
+  stopifnot(file.exists(magma_sum_file))
+  stopifnot(file.exists(paste0(annot_prefix,".genes.annot")))
+  stopifnot(file.exists(magma_executable))
 
   message("Compute genebased p-value with MAGMA")
   #N is irrelevant for outcome in this magma analysis, set arbitrary
   N<-10000
-  cmd <- paste0(magma_executable, " --bfile ", ref_file, " --pval ", summary_file, " N=",N," --gene-model multi --gene-annot ",
+  cmd <- paste0(magma_executable, " --bfile ", ref_file, " --pval ", magma_sum_file, " N=",N," --gene-model multi --gene-annot ",
                 annot_prefix, ".genes.annot --out ", output_prefix)
   system(cmd)
 
@@ -61,8 +110,9 @@ compute_genebasedp <- function(summary_file=NULL,output_prefix=NULL,annot_prefix
   genes
 }
 
-merge_genebasedp <- function(settings=gm_settings){
-  message("Merge genebased p")
+merge_genebasedp <- function(gene_matrix,f){
+  message("Merge genebased p file", f)
+  gene_matrix
 }
 
 # MAGMA analysis example on ADNI
@@ -74,12 +124,6 @@ merge_genebasedp <- function(settings=gm_settings){
 # magma_gene_prefix <- "./magma_igap"
 # magma_annot_prefix <- "./magma_gencode"
 #
-#DAner file HEADER (snp IS RS ID)
-#CHR     SNP     BP      A1      A2      FRQ_A_33640     FRQ_U_43456     INFO    OR      SE      P       ngt     Direction       HetISqt HetChiSq        HetDf   HetPVa
-
-
-
-
 #
 # output_prefix <- "gencode"
 #
@@ -114,18 +158,3 @@ merge_genebasedp <- function(settings=gm_settings){
 # system(cmd)
 #
 # # based on min z-value in gene
-
-
-
-
-
-# Code is format summary data SPECIFIC!!
-#message("Merge summary file info with magma snpmap")
-#df <- fread(summary_file, select = c("SNP", "CHR", "BP", "P", "A1", "A2"))
-#df[, `:=`(snpid, paste0(CHR, ":", BP, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
-
-##df2 <- merge(df, snpmap, by.x = c("snpid", "CHR", "BP"), by.y = c("snpid", "CHR", "POS"), suffixes = c("", ".snpmap"))
-#setnames(df2, "SNP", "SNP2")
-#setnames(df2, "SNP.snpmap", "SNP")
-
-#write.table(df2[, .(SNP, CHR, BP, P, A1, A2)], file = magma_summary_file, sep = " ", quote = F, row.names = F, col.names = T)
