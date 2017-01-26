@@ -79,14 +79,14 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
   if(!file.exists(magma_executable)){install_magma(settings)}
 
   # Create snploc  map
-  if(!file.exists(magma_snpmap_file)){
-  message("Create magma SNP location map...")
-  snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
-  setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
-  snpmap[, `:=`(SNP, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
-  snpmap <- snpmap[, .(SNP, CHR, POS)]
-  save(snpmap,file=magma_snpmap_file)
-  }
+  #if(!file.exists(magma_snpmap_file)){
+  #message("Create magma SNP location map... (can take a couple of minutes)")
+  #snpmap <- fread(paste0(magma_ref_prefix, ".bim"))
+  #setnames(snpmap, c("CHR", "SNP", "CM", "POS", "A1", "A2"))
+  #snpmap[, `:=`(SNP, paste0(CHR, ":", POS, ":", ifelse(A1 < A2, A1, A2), ":", ifelse(A1 >= A2, A1, A2)))]
+  #snpmap <- snpmap[, .(SNP, CHR, POS)]
+  #write.table(snpmap, file = magma_snpmap_file, sep = " ", quote = F, row.names = F, col.names = T)
+  #}
 
   # Create a gene loc
   if(!file.exists(magma_geneloc_file)){
@@ -98,7 +98,7 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
   #Annotate genes
   if(!file.exists(paste0(magma_annot_prefix,".genes.annot"))){
   message("Map snps to genes")
-  cmd <- paste0(magma_executable, " --annotate --snp-loc ", magma_snpmap_file, " --gene-loc ", magma_geneloc_file,
+  cmd <- paste0(magma_executable, " --annotate --snp-loc ", magma_ref_prefix, ".bim --gene-loc ", magma_geneloc_file,
                 " --out ", magma_annot_prefix)
   system(cmd)
   }
