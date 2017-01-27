@@ -17,7 +17,7 @@ process_omim <- function(settings=gm_settings) {
   message("Process OMIM file (warning can be ignored)...")
 
   omim_file <- file.path(settings$cache_dir,settings$omim_morbidmap_file)
-
+  stopifnot(file.exists(omim_file))
   omim <- fread(omim_file)
   setnames(omim,c("pheno","gene_symbols","MIMnr","location"))
 

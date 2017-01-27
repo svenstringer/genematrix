@@ -69,13 +69,19 @@ add_annotations <- function(core, gene_translation_table,settings) {
   gene_matrix <- merge_exacpli("nonpsychexac", gene_matrix, gene_translation_table, settings)
 
   #Add omim
-  gene_matrix <- merge_omim(gene_matrix, gene_translation_table, settings)
+  if(file.exists(file.path(settings$cache_dir),settings$omim_morbidmap_file)){
+    gene_matrix <- merge_omim(gene_matrix, gene_translation_table, settings)
+  }else{
+    message("Omim file ",settings$omim_morbidmap_file," could not be found. This file requires a license and needs to be manually placed in the cachedir to be used for annotation.")
+  }
   #Add gwas catalog
-
+  gene_matrix <- merge_gwascatalog(gene_matrix, gene_translation_table, settings)
   #Add brain expression
-
-  #Add gene-based p-values
-  gene_matrix <- merge_genebased_pvalues(gene_matrix,settings)
+  if(file.exists(file.path(settings$cache_dir,settings$commonmind_DLPFC_diffexpr_file))){
+    gene_matrix <- merge_commonmindDLPFC(gene_matrix, gene_translation_table, settings)
+  }else{
+    message("Common mind DLPFC diff expression file ",commonmind_DLPFC_diffexpr_file," could not be found. This file requires a license and needs to be manually placed in the cachedir to be used for annotation.")
+  }
 
   return(gene_matrix)
 }
