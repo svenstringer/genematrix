@@ -68,8 +68,8 @@ add_annotations <- function(core, gene_translation_table,settings) {
   gene_matrix <- merge_exacpli("fullexac", gene_matrix, gene_translation_table, settings)
   gene_matrix <- merge_exacpli("nonpsychexac", gene_matrix, gene_translation_table, settings)
 
-  #Add ommim
-
+  #Add omim
+  gene_matrix <- merge_omim(gene_matrix, gene_translation_table, settings)
   #Add gwas catalog
 
   #Add brain expression

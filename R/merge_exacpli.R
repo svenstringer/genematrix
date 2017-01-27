@@ -97,8 +97,6 @@ merge_exacpli <- function(pli_suffix, gene_matrix, gene_translation_table, setti
 
     final_df[, c("gene", "chr_pli", "cds_start") := NULL]
 
-
-
     # Rename
     old_names <- c("transcript", "pLI", "pRec", "pNull")
     setnames(final_df, old_names, paste0(old_names, "_", pli_suffix))

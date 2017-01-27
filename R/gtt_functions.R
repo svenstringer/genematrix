@@ -123,6 +123,12 @@ add_excel_collisions <- function(symbol_table) {
     return(new_table)
 }
 
+#' Lookup gene symbol in gene-translation-table (gtt)
+#'
+#' @param symbols character of gene symbols to look up in gtt
+#' @param symbol_table list containing gene_translation_table (mappging from aliases to official gene name)
+#' @return character vector with official gene names
+#' @export
 lookup_symbol <- function(symbols, symbol_table) {
     names_std <- uniform_genenames(symbols)
     res <- sapply(names_std, function(nm) ifelse(is.null(symbol_table[[nm]]), list(NA), list(symbol_table[[nm]])))

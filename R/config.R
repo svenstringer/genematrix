@@ -40,6 +40,7 @@ gm_settings <- list(gencode_version = gencode_version,  #v24 used in UCSC browse
                   nonpsychexacpli_url = "ftp://ftp.broadinstitute.org/pub/ExAC_release/release0.3.1/functional_gene_constraint/fordist_cleaned_nonpsych_z_pli_rec_null_data.txt",
                   gwascatalog_url = "https://www.ebi.ac.uk/gwas/api/search/downloads/alternative",
                   omim_url = "http://omim.org/static/omim/data/mim2gene.txt",
+                  omim_morbidmap_file = "morbidmap.txt",
                   magma_url = paste0("http://ctg.cncr.nl/software/MAGMA/prog/magma_v",magma_version,"_",magma_osversion,".zip"),
                   magma_ref_url = magma_ref_url,
                   sumstats_dir = sumstats_dir,
@@ -60,5 +61,6 @@ gm_settings <- list(gencode_version = gencode_version,  #v24 used in UCSC browse
                   magma_model = "snp-wise=mean", #can be "snp-wise=mean, snp-wise=top, or multi=snp-wise"
                   example_sumstat_url = "https://www.med.unc.edu/pgc/files/resultfiles/daner_PGC_SCZ49_1000G-frq.sh2_mds10.gz",
                   example_sumstat_path = file.path(sumstats_dir,"daner_PGC-SCZ49_1000G-frq_mds10.txt.gz"),
+                  annot_match_suffix="_single_gene_match",
                   output_cols = output_cols
                  )

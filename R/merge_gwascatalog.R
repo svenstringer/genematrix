@@ -7,98 +7,94 @@ process_gwascatalog <- function(settings=gm_settings) {
   stopifnot("gwascatalog_url" %in% names(settings))
 
   gc_url <- settings$gwascatalog_url
-  message("Process gwas catalog file")
-
-  col_selection <- c("PUBMEDID", "DATE","STUDY","DISEASE/TRAIT","")
-
-  #pmid date type trait snpid allele_increasing_risk frequn pval OR_beta maybeOR Ninitial Nrep;
-
   gc_path <- file.path(settings$cache_dir, "gwascatalog_alternative.txt")
-
   stopifnot(!is.null(gc_path))
-
   download_source(gc_url, gc_path)
 
-  gwcatalog <- fread(gc_path,colClasses=list(character=c("P-VALUE","CHR_ID")))
+  message("Process gwas catalog file")
 
-  gwcatalog[,chr := CHR_ID]
-  gwcatalog[,pos := CHR_POS]
-  stopifnot(all(col_selection %in% names(gwcatalog)))
-  pli <- pli[, col_selection, with = F]
-  return(pli)
+  df <- fread(gc_path,colClasses=list(character=c("P-VALUE","CHR_ID","SNP_GENE_IDS","SNP_ID_CURRENT")))
+
+  df[,P := as.double(df$`P-VALUE`)]
+  df[,`P-VALUE` := NULL]
+
+  df <- subset(df,CNV=="N")
+  df <- subset(df,P >= 0 & P<=5E-8)
+  df <- subset(df,startsWith(`STRONGEST SNP-RISK ALLELE`,"rs"))
+  df[,SNPID := sapply(strsplit(`STRONGEST SNP-RISK ALLELE`,split="-"),function(x)x[1])]
+
+  col_selection <- c("SNPID","PUBMEDID", "P","MAPPED_TRAIT")
+  df <- df[, col_selection, with = F]
+
+  df <-  df[, .SD[which.min(P)], by=.(MAPPED_TRAIT,SNPID)]
+
+  message("Read snp reference file...")
+  bim <- fread(paste0(settings$magma_ref_prefix,".bim"))
+  setnames(bim,c("CHR","SNPID","CM","POS","A1","A2"))
+
+  message("Merge SNP position to gwas catalog data")
+  df <- merge(df,bim[,.(SNPID,CHR,POS)],by="SNPID")
+
+  setnames(df,c("gwascatalog_rsid","gwascatalog_mappedtrait","gwascatalog_pubmedid","gwascatalog_p","chr","pos"))
+
+  return(df)
 }
 
-is_gwascatalog_match <- function(chr_pli, chr, start, cds_start, gene_bp_dif) {
-  !is.na(chr_pli) & as.character(chr) == chr_pli & abs(start - cds_start) < gene_bp_dif
+is_snp_in_gene <- function(chr_gwc, pos_gwc, chr_gene, start_gene, end_gene){
+  as.character(chr_gene) == as.character(chr_gwc) & pos_gwc >= start_gene & pos_gwc <= end_gene
 }
 
 
 #' Merge exac pli constraint data into gene matrix
-merge_gwascatalog <- function(pli_suffix, gene_matrix, gene_translation_table, settings=gm_settings) {
+merge_gwascatalog <- function(gene_matrix, gene_translation_table, settings=gm_settings) {
 
-  gene_bp_dif <- settings$gene_bp_dif
+  gwc_file <- file.path(settings$cache_dir,"gwascatalog_mapped.Rdata")
 
-  stopifnot(pli_suffix %in% c("fullexac","nonpsychexac"))
-
-  if (pli_suffix == "fullexac") {
-    pli_url <- settings$fullexacpli_url
-  }
-  if (pli_suffix == "nonpsychexac") {
-    pli_url <- settings$nonpsychexacpli_url
-  }
-
+  if(!file.exists(gwc_file)){
   setkey(gene_matrix, symbol)
 
-  pli <- process_exacpli(pli_suffix,settings)
-  setkey(pli, gene)
+  gwc <- process_gwascatalog(settings)
+  setkey(gwc, chr,pos)
 
-  symbols <- lookup_symbol(pli$gene, gene_translation_table)
-  stopifnot(length(symbols) == nrow(pli))
+  gwc[,symbol:=as.character(NA)]
 
-  max_n_genes <- max(as.vector(sapply(symbols, function(x) length(x))))
+  snp_to_gene_map <- sapply(1:nrow(gwc),function(i){
+    snp=gwc[i]
+    gene_matrix[is_snp_in_gene(snp$chr,snp$pos,gene_matrix$chr_plink,gene_matrix$start,gene_matrix$end),symbol]
+  })
 
-  unmatched_df <- gene_matrix
-  # If earlier transcript column exists, delete (for example if multiple exac pli scores are added) Last transcript
-  # id taken (should be the same transcript anyway)
-  if ("transcript" %in% names(unmatched_df))
-    unmatched_df[, transcript := NULL]
+  stopifnot(length(snp_to_gene_map)==nrow(gwc))
 
-  # Loop over possible symbol aliases and retry merge gene_matrix and pli score matrix
-  for (i in 1:max_n_genes) {
-    pli[, lookup_symbol := as.vector(sapply(symbols, function(x) x[i]))]
-    merged_df <- merge(unmatched_df[, names(gene_matrix), with = F], pli, by.x = "symbol", by.y = "lookup_symbol",
-                       suffixes = c("", "_pli"), all.x = T)
-    unmatched_df <- merged_df[!is_pli_match(chr_pli, chr, start, cds_start, gene_bp_dif), ]
-    new_matches <- merged_df[is_pli_match(chr_pli, chr, start, cds_start, gene_bp_dif), ]
-    stopifnot(nrow(unmatched_df) + nrow(new_matches) == nrow(merged_df))
-    if (i == 1) {
-      final_df <- new_matches
-    } else {
-      final_df <- rbind(final_df, new_matches)
-    }
+  for(i in 1:length(snp_to_gene_map)){
+    snp <- snp_to_gene_map[[i]]
+    if(length(snp)>0){
+      gwc[i,symbol:= snp[1]]
+      if(length(snp)>1){
+        for(s in snp[-1]){
+          nrow <- gwc[i,]
+          nrow[1,symbol:= s]
+          rbind(gwc,nrow)
+        }
+      }}}
+
+  gwc <- gwc[,.(paste0(gwascatalog_rsid,collapse=settings$value_sep),
+                paste0(gwascatalog_mappedtrait,collapse=settings$value_sep),
+                paste0(gwascatalog_p,collapse=settings$value_sep),
+                paste0(gwascatalog_pubmedid,collapse=settings$value_sep)),
+                by=c("symbol")]
+  setnames(gwc,old=c("V1","V2","V3","V4"),new=c("gwascatalog_rsid","gwascatalog_mappedtrait","gwascatalog_p","gwascatalog_pubmedid"))
+  gwc <- subset(gwc,!is.na(symbol))
+
+  save(gwc,file=gwc_file)
   }
-  pli_colnames <- setdiff(names(unmatched_df), names(gene_matrix))
+  load(gwc_file)
 
-  unmatched_df[, (pli_colnames) := NA]
-
-  final_df <- rbind(final_df, unmatched_df)
-
-  # Remove pli matches that map to multiple genes
-  duplicate_genes <- names(table(final_df$symbol)[table(final_df$symbol) > 1])
-  final_df[symbol %in% duplicate_genes, (pli_colnames) := NA]
-
-  final_df <- unique(final_df)
-
-  stopifnot(nrow(final_df) == nrow(gene_matrix))
-
-  n_matches <- nrow(final_df[is_pli_match(chr_pli, chr, start, cds_start, gene_bp_dif), ])
-  message(n_matches, " genes out of ", nrow(final_df), " are uniquely matched to genes in pli_", pli_suffix, " data")
-
-  final_df[, c("gene", "chr_pli", "cds_start") := NULL]
-
-  # Rename
-  old_names <- c("transcript", "pLI", "pRec", "pNull")
-  setnames(final_df, old_names, paste0(old_names, "_", pli_suffix))
-
-  final_df
+  merged_df <- merge(gene_matrix, gwc[,.(symbol,gwascatalog_rsid,gwascatalog_mappedtrait,gwascatalog_p,gwascatalog_pubmedid)], by= "symbol", all.x = T,all.y=F)
+  stopifnot(nrow(merged_df)==nrow(gene_matrix))
+  n_matches <- sum(!is.na(merged_df$gwascatalog_rsid),na.rm=T)
+  message(n_matches, " genes out of ", nrow(merged_df), " are uniquely matched to mapped genes in gwascatalog data")
+  merged_df
 }
+
+
+

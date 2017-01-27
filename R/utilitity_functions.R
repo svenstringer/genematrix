@@ -8,7 +8,6 @@
 #'
 #' @return None
 download_source <- function(source_url, dest_path) {
-
   if (!file.exists(dest_path)) {
     message("Downloading ", source_url, " to ", dest_path)
     download_ok <- !download.file(source_url, dest_path,mode="wb")
@@ -125,4 +124,35 @@ create_dir <- function(dir_name) {
 #' @return None
 check_path <- function(path_name) {
   if (!file.exists(path_name))  stop("ERROR: file ", path_name, " does not exist")
+}
+
+#' Merge processed annotation file to gene matrix
+#' @param annot_label label used to name annotation in genematrix columnname
+#' @param process_function function to process the annotation only accepting settings as parameter
+#' @param gene_matrix data.table with gene matrix to merge annotation with
+#' @param gene_translation_table data.table to look up official gene symbols
+#' @param settings list with global settings
+#'@export
+merge_annotation_type <- function(annot_label,process_function,gene_matrix,gene_translation_table,settings){
+  annot_match_suffix <- settings$annot_match_suffix
+
+  annot_df <- process_function(settings)
+  setkey(annot_df, gene)
+
+  symbols <- lookup_symbol(annot_df$gene, gene_translation_table)
+  stopifnot(length(symbols) == nrow(annot_df))
+
+  #Number of official gene symbols a gene name could be mapped (choose first if more than one)
+  n_genes <- sapply(symbols,length)
+
+  first_gene <-as.character(sapply(symbols,function(x)x[1]))
+  annot_df[,gene:=first_gene]
+  annot_df[,`:=`(paste0(annot_label,map_suffix),(n_genes==1))]
+
+  merged_df <- merge(gene_matrix, annot_df, by.x = "symbol", by.y = "gene", all.x = T)
+
+  n_matches <- sum(merged_df[[paste0(annot_label,map_suffix)]],na.rm=T)
+  message(n_matches, " genes out of ", nrow(merged_df), " are uniquely matched to genes in ", annot_label, " data")
+
+  merged_df
 }
