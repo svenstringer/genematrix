@@ -8,10 +8,6 @@
 #'
 #' @return None
 download_source <- function(source_url, dest_path) {
-<<<<<<< HEAD
-=======
-
->>>>>>> 5f01c51ecc4282059211567c04464b77e78b2c18
   if (!file.exists(dest_path)) {
     message("Downloading ", source_url, " to ", dest_path)
     download_ok <- !download.file(source_url, dest_path,mode="wb")
@@ -129,7 +125,6 @@ create_dir <- function(dir_name) {
 check_path <- function(path_name) {
   if (!file.exists(path_name))  stop("ERROR: file ", path_name, " does not exist")
 }
-<<<<<<< HEAD
 
 #' Merge processed annotation file to gene matrix
 #' @param annot_label label used to name annotation in genematrix columnname
@@ -161,5 +156,3 @@ merge_annotation_type <- function(annot_label,process_function,gene_matrix,gene_
 
   merged_df
 }
-=======
->>>>>>> 5f01c51ecc4282059211567c04464b77e78b2c18

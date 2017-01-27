@@ -6,11 +6,7 @@
 \title{symbol','aliases','strand','merge_trial',
 tag','source','feature','remap_status','hgnc_id','entrez_id')
 Global settings available after loading GeneMatrix package}
-<<<<<<< HEAD
 \format{An object of class \code{list} of length 31.}
-=======
-\format{An object of class \code{list} of length 29.}
->>>>>>> 5f01c51ecc4282059211567c04464b77e78b2c18
 \usage{
 gm_settings
 }
