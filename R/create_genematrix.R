@@ -14,7 +14,7 @@ stopifnot(c("gencode_version","cache_dir") %in% names(settings) )
 
 #If no gene_matrix_path is found in settings list a default filename is save in the current working directory.
 if(! "gene_matrix_prefix" %in% names(settings) ){
-  gene_matrix_prefix <- paste0("genematrix_core_gencode", settings$gencode_version, "_", Sys.Date())
+  gene_matrix_prefix <- paste0("genematrix_gencodev", settings$gencode_version, "_v", settings$gmversion)
   gene_matrix_path <- file.path(getwd(), gene_matrix_prefix)
 }
 
@@ -69,7 +69,7 @@ add_annotations <- function(core, gene_translation_table,settings) {
   gene_matrix <- merge_exacpli("nonpsychexac", gene_matrix, gene_translation_table, settings)
 
   #Add omim
-  if(file.exists(file.path(settings$cache_dir),settings$omim_morbidmap_file)){
+  if(file.exists(file.path(settings$cache_dir,settings$omim_morbidmap_file))){
     gene_matrix <- merge_omim(gene_matrix, gene_translation_table, settings)
   }else{
     message("Omim file ",settings$omim_morbidmap_file," could not be found. This file requires a license and needs to be manually placed in the cachedir to be used for annotation.")
@@ -97,16 +97,20 @@ add_annotations <- function(core, gene_translation_table,settings) {
 #' @return None
 #'
 #' @export
-publish_genematrix <- function(gene_matrix, gene_matrix_prefix,output_cols=gm_settings$output_colnames) {
+publish_genematrix <- function(gene_matrix, gene_matrix_prefix=NULL,output_cols=gm_settings$output_colnames) {
 
-  write.table(gene_matrix,file=paste0(gene_matrix_prefix,".csv"),quote=T,sep='\t',row.names=F)
+  if(is.null(gene_matrix_prefix)){
+    #If no gene_matrix_path is found in settings list a default filename is save in the current working directory.
+    gene_matrix_prefix <- paste0("genematrix_gencodev", settings$gencode_version, "_v", settings$gmversion)
+    gene_matrix_path <- file.path(getwd(), gene_matrix_prefix)
+  }
+
+  setkey(gene_matrix,chr,start)
+
+  write.table(gene_matrix,file=paste0(gene_matrix_prefix,".tsv"),quote=F,sep='\t',row.names=F)
+  write.table(gene_matrix,file=paste0(gene_matrix_prefix,".csv"),quote=T,sep=',',row.names=F)
+  write.foreign(df=gene_matrix, datafile=paste0(gene_matrix_prefix,"_sas.csv"), codefile=paste0(gene_matrix_prefix,".sas"), package="SAS")
   save(gene_matrix,file=paste0(gene_matrix_prefix,".Rdata"))
 
   message("Gene matrix saved")
 }
-
-
-
-
-
-

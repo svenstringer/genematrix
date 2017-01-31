@@ -52,14 +52,37 @@ merge_genebased_pvalues <- function(gene_matrix,settings=gm_settings){
 
   annotate_magma(gene_matrix,settings)
 
+  res <- merge_snpnrs(gene_matrix,settings)
+
   compute_genebased_pvalues(settings)
 
   genep_files <- Sys.glob(file.path(settings$cache_dir,"*.genes.out"))
 
   for(f in genep_files){
-    res<- merge_genebased_p(gene_matrix,f)
+    res<- merge_genebased_p(res,f)
   }
   res
+}
+
+
+#' Merge nr of SNPs per gene used in gene-based test
+#'
+#' @param gene_matrix a data.table with gene annotation
+#' @param settings a list containing all magma-related settings
+#'
+#' @return a data.table with nr of SNPs added
+#'
+#' @export
+merge_snpnrs <- function(gene_matrix,settings=gm_settings){
+
+  annot_file <- paste0(settings$magma_annot_prefix,".genes.annot")
+  stopifnot(file.exists(annot_file))
+  #automatically split on : (dirty hack)
+  snp_annot <- fread(annot_file)
+  entrez_ids <- sapply(strsplit(snp_annot$V1,split="\t"),function(x){x[[1]]})
+  snpn <- sapply(strsplit(snp_annot$V3,split="\t"),function(x){length(x)-1})
+
+  res <- merge(res,data.table(entrez_id=entrez_ids,N_snps_1000g=snpn),x.all=T)
 }
 
 

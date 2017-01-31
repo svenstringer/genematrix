@@ -15,7 +15,7 @@ Description: The GeneMatrix package is designed to create an annotated
 Depends:
     R (>= 3.3.1)
 Imports:
-    data.table,
+    data.table, foreign,
     utils, stats, R.utils
 License: None
 Encoding: UTF-8

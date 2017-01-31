@@ -23,6 +23,8 @@ process_omim <- function(settings=gm_settings) {
 
   omim <- omim[endsWith(pheno,"(3)") & !startsWith(pheno,"?") ]
   omim[,gene:=sapply(strsplit(omim$gene_symbols,split=","),function(x)x[[1]])]
+  omim[,pheno:=sapply(omim$pheno,function(x)substr(x[[1]],0,nchar(x[[1]])-4))]
+
   omim <- unique(omim[,.(pheno,gene)])
 
 

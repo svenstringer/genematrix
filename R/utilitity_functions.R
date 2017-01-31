@@ -134,7 +134,7 @@ check_path <- function(path_name) {
 #' @param settings list with global settings
 #'@export
 merge_annotation_type <- function(annot_label,process_function,gene_matrix,gene_translation_table,settings){
-  annot_match_suffix <- settings$annot_match_suffix
+  map_suffix <- settings$annot_match_suffix
 
   annot_df <- process_function(settings)
   setkey(annot_df, gene)
