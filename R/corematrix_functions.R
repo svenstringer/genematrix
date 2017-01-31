@@ -272,19 +272,24 @@ process_entrezfile <- function(entrez_path, value_sep) {
 
     setnames(entrez,old=old_columns, new=new_names)
 
+    entrez[chr=="X|Y",chr:="XY"]
+    entrez[chr=="MT",chr:="M"]
+
+
+    message("Add chr column based on location and delete genes with locations not in 1-22,X,Y,XY,M")
+    chr_ids <- c(as.character(1:22), "X", "Y", "XY","M")
+    entrez[, chr_factor := factor(chr, levels = chr_ids, ordered = T)]
+    entrez <- subset(entrez, (chr %in% chr_ids))
+
 
     message("Change field separator string into custom separator ", value_sep)
 
     for (col_name in names(entrez)) {
-        if (class(entrez[, col_name,with=F][[1]]) == "character")
+        if (class(entrez[, col_name,with=F][[1]])[1] == "character")
             entrez[, (col_name) :=  gsub("|", value_sep, entrez[, col_name, with = F][[1]],
                                          fixed = T)]
     }
 
-    message("Add chr column based on location and delete genes with locations not in 1-22,X,Y,M")
-    chr_ids <- c(as.character(1:22), "X", "Y", "M")
-    entrez[, chr := factor(chr, levels = chr_ids, ordered = T)]
-    entrez <- subset(entrez, !is.na(chr))
 
     message("Entrez table contains ", nrow(entrez), " gene entries")
 
@@ -377,7 +382,8 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
 #' Merge gencode and hgnc file
 merge_core_entrez <- function(core, entrez) {
     df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr_id"),
-                by.y = c("entrez_id", "entrez_gene_name", "chr"))
+                by.y = c("entrez_id", "entrez_gene_name", "chr_factor"))
+    df[,chr.y:=NULL]
     uniq_entrez_ids <- as.numeric(names(table(df$entrez_id)[table(df$entrez_id) == 1]))
 
     message("Removing ", nrow(df) - length(uniq_entrez_ids), " gene entries due to duplicate entrez id")
