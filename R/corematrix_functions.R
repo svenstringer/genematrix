@@ -260,14 +260,12 @@ process_entrezfile <- function(entrez_path, value_sep) {
       entrez <- fread(paste("gunzip -c", entrez_path))
     }
 
-    old_columns <- c("GeneID", "Symbol", "chromosome", "map_location",
-                     "description", "type_of_gene", "Symbol_from_nomenclature_authority",
-                     "Full_name_from_nomenclature_authority", "Nomenclature_status",
+    old_columns <- c("GeneID", "Symbol", "chromosome",
+                     "description", "type_of_gene",
                      "Other_designations")
 
     new_names <- c("entrez_id", "entrez_gene_name", "chr",
-                   "entrez_map_location", "entrez_description", "entrez_type_of_gene",
-                   "entrez_hgncsymbol", "entrez_hgncname", "entrez_hgnc_status",
+                    "entrez_description", "entrez_type_of_gene",
                    "entrez_other_designations")
 
     entrez <- entrez[,old_columns,with=F]
@@ -378,17 +376,12 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
 
 #' Merge gencode and hgnc file
 merge_core_entrez <- function(core, entrez) {
-    df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr_ID"),
+    df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr_id"),
                 by.y = c("entrez_id", "entrez_gene_name", "chr"))
     uniq_entrez_ids <- as.numeric(names(table(df$entrez_id)[table(df$entrez_id) == 1]))
 
     message("Removing ", nrow(df) - length(uniq_entrez_ids), " gene entries due to duplicate entrez id")
     df <- df[entrez_id %in% uniq_entrez_ids, ]
-
-    #Remove redundent columns
-    df[,entrez_map_location := NULL]
-    df[,entrez_hgncsymbol := NULL]
-    df[,entrez_hgncname := NULL]
 
     message("Total number of genes in core matrix after merge with entrez info: ", nrow(df))
 

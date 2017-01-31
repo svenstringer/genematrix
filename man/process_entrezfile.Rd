@@ -8,6 +8,8 @@ ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz > gene i
 process_entrezfile(entrez_path, value_sep)
 }
 \arguments{
+\item{value_sep}{value separator used for multi-value columns}
+
 \item{entrez}{gene info file path of downloaded .gz file}
 }
 \value{
