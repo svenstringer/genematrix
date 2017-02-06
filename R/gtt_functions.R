@@ -43,7 +43,7 @@ create_symbol_table <- function(core, value_sep, excel_col = T) {
 
         for (al in current_aliases) {
             if (is.null(symbol_table[[al]])) {
-                symbol_table[[al]] <- c(symbols[i])
+                symbol_table[[al]] <- symbols[i]
             } else {
                 symbol_table[[al]] <- unique(c(symbol_table[[al]], symbols[i]))
             }
@@ -52,6 +52,9 @@ create_symbol_table <- function(core, value_sep, excel_col = T) {
 
     if (excel_col)
         symbol_table <- add_excel_collisions(symbol_table)
+
+    if(any(is.na(symbol_table[[al]]))){stop(paste(current_aliases,al,i))}
+
     return(symbol_table)
 }
 

@@ -10,6 +10,9 @@ generate_genematrix(settings = gm_settings)
 \item{settings}{a named list with user specified settings. Defaults to global defaults in gm_setting
 stored in config.R}
 }
+\value{
+data.table with gene matrix
+}
 \description{
 Main function to generate a default Gene Matrix and store it in a data.table.
 The first time this may take a long time (up to an hour). Will be much quicker due to caching later.

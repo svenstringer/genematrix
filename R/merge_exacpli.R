@@ -1,4 +1,5 @@
 #' Process exac pli constraint file
+#' @export
 process_exacpli <- function(pli_suffix,settings=gm_settings) {
     stopifnot(pli_suffix %in% c("fullexac","nonpsychexac"))
 
@@ -35,6 +36,7 @@ is_pli_match <- function(chr_pli, chr, start, cds_start, gene_bp_dif) {
 
 
 #' Merge exac pli constraint data into gene matrix
+#' @export
 merge_exacpli <- function(pli_suffix, gene_matrix, gene_translation_table, settings=gm_settings) {
 
     gene_bp_dif <- settings$gene_bp_dif
@@ -59,10 +61,7 @@ merge_exacpli <- function(pli_suffix, gene_matrix, gene_translation_table, setti
     max_n_genes <- max(as.vector(sapply(symbols, function(x) length(x))))
 
     unmatched_df <- gene_matrix
-    # If earlier transcript column exists, delete (for example if multiple exac pli scores are added) Last transcript
-    # id taken (should be the same transcript anyway)
-    if ("transcript" %in% names(unmatched_df))
-        unmatched_df[, transcript := NULL]
+
 
     # Loop over possible symbol aliases and retry merge gene_matrix and pli score matrix
     for (i in 1:max_n_genes) {

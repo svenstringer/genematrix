@@ -1,5 +1,6 @@
 #' @import data.table
 #' @import R.utils
+#' @importFrom foreign write.foreign
 #' @importFrom stats end start
 #' @importFrom utils download.file write.table
 NULL
@@ -53,14 +54,15 @@ gm_settings <- list(gencode_version = gencode_version,  #v24 used in UCSC browse
                   gene_bp_dif = 5e+05,
                   snp_gene_bp_dif = 25000,
                   magma_dir = magma_dir,
+                  magma_version = magma_version,
                   magma_executable = file.path(magma_dir,ifelse(magma_osversion=="win_static","magma.exe","magma")),
                   magma_ref_prefix = file.path(magma_dir,substr(basename(magma_ref_url),0,nchar(basename(magma_ref_url))-4)),
                   magma_geneloc_file = file.path(magma_dir,paste0("magma_gencode",gencode_version,"_geneloc.txt")),
                   magma_annot_prefix = file.path(magma_dir,paste0("magma_gencode",gencode_version)),
                   magma_snpmap_file = file.path(magma_dir,paste0("magma_gencode",gencode_version,"_snpmap.txt")),
-                  magma_model = "snp-wise=mean", #can be "snp-wise=mean, snp-wise=top, or multi=snp-wise"
+                  magma_model = "multi=snp-wise", #can be "snp-wise=mean" (quickest <1 hour)  or "multi=snp-wise" for joint mean/topsnp pvalue (slow (hours) but most power)
                   example_sumstat_url = "https://www.med.unc.edu/pgc/files/resultfiles/daner_PGC_SCZ49_1000G-frq.sh2_mds10.gz",
                   example_sumstat_path = file.path(sumstats_dir,"daner_PGC-SCZ49_1000G-frq_mds10.txt.gz"),
                   annot_match_suffix="_single_gene_match",
-                  output_cols = output_cols
+                  output_col_file = file.path(".","legend_genematrix.csv")
                  )

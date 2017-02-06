@@ -35,7 +35,7 @@ for(f in sum_files){
    output_prefix <- file.path(gm_settings$cache_dir,strsplit(basename(f),split="_")[[1]][2])
   if(!file.exists(paste0(output_prefix, ".genes.out"))){
     if(endsWith(f,".gz")){
-      message("Warning: file ",f," is .gz file and will not be processed. Make sure you have all summary files prepared unzipped daner files")
+      stop("Error: file ",f," is .gz file and will not be processed. Make sure you have all summary files prepared unzipped daner files")
     }else{
     compute_genebased_p(f,output_prefix=output_prefix,magma_model=settings$magma_model)
     }
@@ -74,15 +74,16 @@ merge_genebased_pvalues <- function(gene_matrix,settings=gm_settings){
 #'
 #' @export
 merge_snpnrs <- function(gene_matrix,settings=gm_settings){
-
+  message("Merge nr of snps per gene...")
   annot_file <- paste0(settings$magma_annot_prefix,".genes.annot")
   stopifnot(file.exists(annot_file))
   #automatically split on : (dirty hack)
   snp_annot <- fread(annot_file)
-  entrez_ids <- sapply(strsplit(snp_annot$V1,split="\t"),function(x){x[[1]]})
+  entrez_ids <- as.numeric(sapply(strsplit(snp_annot$V1,split="\t"),function(x){x[[1]]}))
   snpn <- sapply(strsplit(snp_annot$V3,split="\t"),function(x){length(x)-1})
 
-  res <- merge(res,data.table(entrez_id=entrez_ids,N_snps_1000g=snpn),x.all=T)
+  res <- merge(gene_matrix,data.table(entrez_id=entrez_ids,N_snps_1000g=snpn),all.x=T,by.x="entrez_id",by.y="entrez_id")
+  res
 }
 
 
@@ -134,9 +135,15 @@ compute_genebased_p <- function(summary_file=NULL,output_prefix=NULL,annot_prefi
 merge_genebased_p <- function(gene_matrix,f){
   message("Merge genebased p file", f)
   genes <- fread(f,colClasses = c(CHR="character"))
-  genes <- genes[,.(GENE,CHR,P)]
   pval_colname <- substr(basename(f),start=1,stop=nchar(basename(f))-10)
-  genes[,`:=`(paste0("gene_based_P_",pval_colname),P)]
-  genes[,P:=NULL]
-  gene_matrix <- merge(gene_matrix,genes,by.x=c("entrez_id","chr_name"),by.y=c("GENE","CHR"),x.all=T)
+  if("P" %in% names(genes)){
+    genes <- genes[,.(GENE,CHR,P)]
+    genes[,`:=`(paste0("gene_based_P_",pval_colname),P)]
+    genes[,P:=NULL]
+  }else{
+    genes <- genes[,.(GENE,CHR,P_JOINT)]
+    genes[,`:=`(paste0("gene_based_P_",pval_colname),P_JOINT)]
+    genes[,P_JOINT:=NULL]
+  }
+  gene_matrix <- merge(gene_matrix,genes,by.x=c("entrez_id","chr"),by.y=c("GENE","CHR"),all.x=T)
 }

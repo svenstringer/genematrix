@@ -5,7 +5,7 @@
 #'
 #' @param source_url url to source file to download
 #' @param dest_path path to save source file in
-#'
+#' @export
 #' @return None
 download_source <- function(source_url, dest_path) {
   if (!file.exists(dest_path)) {
@@ -108,6 +108,7 @@ annotate_magma <- function(gene_matrix,settings=gm_settings){
 #' @param dir_name directory name to check
 #'
 #' @return None
+#' @export
 create_dir <- function(dir_name) {
   dir.create(dir_name, showWarnings = FALSE)
   if (!file.exists(dir_name)) {
@@ -133,26 +134,18 @@ check_path <- function(path_name) {
 #' @param gene_translation_table data.table to look up official gene symbols
 #' @param settings list with global settings
 #'@export
-merge_annotation_type <- function(annot_label,process_function,gene_matrix,gene_translation_table,settings){
-  map_suffix <- settings$annot_match_suffix
+merge_annotation_by_genename <- function(annot_label,annot_df,gene_matrix,gene_translation_table,settings){
+  stopifnot("gene" %in% names(annot_df))
 
-  annot_df <- process_function(settings)
   setkey(annot_df, gene)
-
-  symbols <- lookup_symbol(annot_df$gene, gene_translation_table)
-  stopifnot(length(symbols) == nrow(annot_df))
-
-  #Number of official gene symbols a gene name could be mapped (choose first if more than one)
-  n_genes <- sapply(symbols,length)
-
-  first_gene <-as.character(sapply(symbols,function(x)x[1]))
-  annot_df[,gene:=first_gene]
-  annot_df[,`:=`(paste0(annot_label,map_suffix),(n_genes==1))]
 
   merged_df <- merge(gene_matrix, annot_df, by.x = "symbol", by.y = "gene", all.x = T)
 
-  n_matches <- sum(merged_df[[paste0(annot_label,map_suffix)]],na.rm=T)
+
+  n_matches <- sum(!is.na(merged_df[[names(annot_df)[names(annot_df)!="gene"][1]]]))
   message(n_matches, " genes out of ", nrow(merged_df), " are uniquely matched to genes in ", annot_label, " data")
+
+  stopifnot(nrow(merged_df)==nrow(gene_matrix))
 
   merged_df
 }

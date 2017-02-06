@@ -31,6 +31,7 @@
 
 #' @param gencode_path file path of downloaded .gtf.gz file
 #' @return processed gencode table as \code{data.table}
+#' @export
 #' @examples
 #' \dontrun{
 #' gencode_data <- process_gencodefile(gencode_path)
@@ -175,6 +176,7 @@ process_gencodefile <- function(gencode_path) {
 #' @param hgnc_path file path of downloaded .txt file
 #' @param value_sep character string to separate multi-value fields
 #' @return processed hgnc table as data.table
+#' @export
 process_hgncfile <- function(hgnc_path, value_sep) {
     columns <- c("hgnc_id", "symbol", "name", "locus_group", "locus_type", "gene_family",
                  "gene_family_id", "alias_symbol", "alias_name", "prev_symbol", "location",
@@ -246,6 +248,7 @@ process_hgncfile <- function(hgnc_path, value_sep) {
 #' @param entrez gene info file path of downloaded .gz file
 #' @param value_sep value separator used for multi-value columns
 #' @return processed gene info table as data.table
+#' @export
 #' @examples
 #' \dontrun{
 #' entrez_file <- process_entrez(entrez_path)
@@ -298,6 +301,7 @@ process_entrezfile <- function(entrez_path, value_sep) {
 
 
 #' Merge gencode and hgnc file
+#' @export
 merge_gencode_hgnc <- function(gencode, hgnc) {
 
     gencode_hgnc_suffixes <- c("_gencode", "_hgnc")
@@ -380,10 +384,11 @@ merge_gencode_hgnc <- function(gencode, hgnc) {
 }
 
 #' Merge gencode and hgnc file
+#' @export
 merge_core_entrez <- function(core, entrez) {
-    df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr_id"),
-                by.y = c("entrez_id", "entrez_gene_name", "chr_factor"))
-    df[,chr.y:=NULL]
+    df <- merge(core, entrez, by.x = c("entrez_id", "symbol", "chr_name"),
+                by.y = c("entrez_id", "entrez_gene_name", "chr_factor"),suffixes=c("","_entrez"))
+    df[,chr_entrez:=NULL]
     uniq_entrez_ids <- as.numeric(names(table(df$entrez_id)[table(df$entrez_id) == 1]))
 
     message("Removing ", nrow(df) - length(uniq_entrez_ids), " gene entries due to duplicate entrez id")
@@ -434,7 +439,25 @@ create_core_matrix <- function(gencode_url,hgnc_url,entrez_url,value_sep, downlo
     entrez <- process_entrezfile(entrez_path, value_sep = value_sep)
     core <- merge_gencode_hgnc(gencode, hgnc)
     core <- merge_core_entrez(core, entrez)
+    core <- merge_url_links(core)
     return(core)
+}
+
+
+#' Merge url links to common resources
+#'
+#' @param core data.table with gene definition
+#' @return data.table with core gene matrix including url links to relevant resources
+#' @export
+merge_url_links <- function(core){
+
+  core[,ucsc_link := paste0("http://genome.ucsc.edu/cgi-bin/hgTracks?&org=Human&db=hg19&position=",chr_prefix,"%3A",format(start,scientific=F,trim=T),"-",format(end,scientific=F,trim=T))]
+  core[,genecards_link := paste0("http://www.genecards.org/cgi-bin/carddisp.pl?gene=",symbol)]
+  core[,wikipedia_link := paste0("https://en.wikipedia.org/wiki/",symbol)]
+  core[,pubmed_link := paste0("https://www.ncbi.nlm.nih.gov/pubmed?term=",symbol)]
+  core[,wikigenes_link := paste0("http://www.wikigenes.org/?search=",symbol)]
+
+  return(core)
 }
 
 

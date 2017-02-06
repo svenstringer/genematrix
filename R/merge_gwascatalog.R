@@ -46,7 +46,7 @@ is_snp_in_gene <- function(chr_gwc, pos_gwc, chr_gene, start_gene, end_gene){
 
 
 #' Merge exac pli constraint data into gene matrix
-merge_gwascatalog <- function(gene_matrix, gene_translation_table, settings=gm_settings) {
+merge_gwascatalog <- function(gene_matrix, settings=gm_settings) {
 
   gwc_file <- file.path(settings$cache_dir,"gwascatalog_mapped.Rdata")
 
@@ -89,7 +89,7 @@ merge_gwascatalog <- function(gene_matrix, gene_translation_table, settings=gm_s
   }
   load(gwc_file)
 
-  merged_df <- merge(gene_matrix, gwc[,.(symbol,gwascatalog_rsid,gwascatalog_mappedtrait,gwascatalog_p,gwascatalog_pubmedid)], by= "symbol", all.x = T,all.y=F)
+  merged_df <- merge(gene_matrix, gwc[,.(symbol,gwascatalog_rsid,gwascatalog_mappedtrait,gwascatalog_p,gwascatalog_pubmedid)], by= "symbol", all.x = T)
   stopifnot(nrow(merged_df)==nrow(gene_matrix))
   n_matches <- sum(!is.na(merged_df$gwascatalog_rsid),na.rm=T)
   message(n_matches, " genes out of ", nrow(merged_df), " are uniquely matched to mapped genes in gwascatalog data")

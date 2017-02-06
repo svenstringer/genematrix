@@ -4,8 +4,7 @@
 \alias{merge_commonmindDLPFC}
 \title{Merge omim phenotypes to gene matrix}
 \usage{
-merge_commonmindDLPFC(gene_matrix, gene_translation_table,
-  settings = gm_settings)
+merge_commonmindDLPFC(gene_matrix, settings = gm_settings)
 }
 \description{
 Merge omim phenotypes to gene matrix

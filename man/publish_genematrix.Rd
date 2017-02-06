@@ -5,7 +5,7 @@
 \title{Save customized gene matrix based on settings}
 \usage{
 publish_genematrix(gene_matrix, gene_matrix_prefix = NULL,
-  output_cols = gm_settings$output_colnames)
+  settings = gm_settings, utility_version = T)
 }
 \arguments{
 \item{gene_matrix}{a data.table with gene annotation to save}

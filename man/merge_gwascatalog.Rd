@@ -4,7 +4,7 @@
 \alias{merge_gwascatalog}
 \title{Merge exac pli constraint data into gene matrix}
 \usage{
-merge_gwascatalog(gene_matrix, gene_translation_table, settings = gm_settings)
+merge_gwascatalog(gene_matrix, settings = gm_settings)
 }
 \description{
 Merge exac pli constraint data into gene matrix
