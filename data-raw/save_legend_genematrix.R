@@ -1,0 +1,6 @@
+library(data.table)
+wdtemp <- getwd()
+setwd(file.path(wdtemp,"genematrix","data-raw"))
+default_output_cols <- fread("legend_genematrix.csv")
+devtools::use_data(default_output_cols, internal = TRUE,overwrite=T)
+setwd(wdtemp)

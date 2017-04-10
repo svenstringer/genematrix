@@ -1,0 +1,76 @@
+label,utility_version,description,source
+gene_name,Y,Official HGNC gene symbol,hgnc
+chr,N,"Chromosome labels  as 1:22,X,Y,M  (character in .Rdata file)",gencode
+chr_id,N,"Same as chr, but stored as factor in .Rdata file",gencode
+chr_full,Y,Same as chr but with ‘chr’ prefix,gencode
+chr_char,Y,"Chromsome labels as 1-22, X,Y,XY,M",gencode
+chr_plink,Y,"Chromosome in plink notation: 1-22, 23=X,24=Y,25=XY,26=M",gencode
+start,Y,Start gene bp position in hg 19,gencode
+end,Y,End gene bp position in hg 19,gencode
+strand,Y,Strand of gene (+/-),gencode
+is_par,Y,Whether or not gene is located in pseudo-autosomal region on X or Y chromosome defined as: genes on Y with end_pos <=2649520 OR start_pos >=59034050 or genes on X with end_pos <=2699520 OR start_pos >=154931044,gencode
+ucsc_link,Y,URL to UCSC gene region,link
+genecards_link,Y,URL to genecards gene entry,link
+wikipedia_link,Y,URL to wikipedia gene search term results,link
+pubmed_link,Y,URL to pubmed gene search term results,link
+wikigenes_link,Y,URL to wikigenes gene entry,link
+gencode_gene_name,N,Gene name used in gencode file,gencode
+gencode_source,N,Original source of gene definition: HAVANA or ENSEMBL,gencode
+gencode_gene_type,Y,"Gencode classification for gene type (e.g., protein_coding, antisense, processed_pseucogene, lincRNA etc.)",gencode
+entrez_id,Y,Entrez gene id,entrez
+ensembl_id,Y,Ensembl gene id as stated in gencode file,gencode
+ensembl_id_long,N,Ensembl gene id as stated in gencode file in long format (.x notation),gencode
+hgnc_id,Y,HGNC id,hgnc
+refseq_accession,Y,refseq accession from HGNC file,hgnc
+N_snps_1000g,N,nr of SNPs in gene in 1000 genomes,magma
+gene_based_P_pheno,Y,Gene-based pvalue magma for phenotype S (multi=snpwise option) using 1000 genomes as reference file and gencode for gene-definition,magma
+ucsc_id,Y,UCSC id from HGNC file,hgnc
+ccds_id,Y,ccds id from HGNC file,hgnc
+uniprot_ids,Y,uniprot ids from HGNC file,hgnc
+hgnc_pubmed_id,N,pubmed ids related to gene from HGNC file,hgnc
+havana_id,N,Havana gene id as stated in gencode file,gencode
+vega_id,N,Vega gene id as stated in gencode file,gencode
+no_vegaid_match,N,Whether or not the vega_id in gencode and HGNC file matched (gencode vega_id was used if they did not match),
+aliases,N,All known gene symbol aliases (including official symbol) of the gene,hgnc
+hgnc_alias_names,N,HGNC alias (full) gene names,hgnc
+gencode_tag,N,"Gencode gene tag including tags such as ‘ncRNA_host’, ‘pseudo_consens’, ‘overlapping_locus’",gencode
+gencode_verification_level,Y,"Locus ‘manually annotated’, ‘verified’, or ‘automatically annotated’",gencode
+remap_status,N,Status after gencode backmapping to hg19: ‘automatic_gene’ vs ’full_contig’,gencode
+remap_target_status,N,Target status after gencode backmapping to hg19: ‘new’ vs ‘overlap’,gencode
+hgnc_gene_product,Y,Full HGNC gene name,hgnc
+hgnc_locus_group,Y,HGNC gene classification,hgnc
+hgnc_locus_type,N,HGNC locus type,hgnc
+hgnc_gene_family,Y,HGNC gene family,hgnc
+hgnc_gene_family_id,N,HGNC gene family id,hgnc
+hgnc_merge_trial,N,"Merge trial hgnc file with gencode. First merge gencode/hgnc based on gene name, ensembl id and chromosome; second merge based on gene symbol and chromosome; third merge based on ensembl id and chromosome.",hgnc
+entrez_description,N,Gene description as stated in entrez file,entrez
+entrez_type_of_gene,N,Entrez gene type classification,entrez
+entrez_other_designations,N,Other full gene names as stated in entrez file,entrez
+transcript_nonpsychexac,N,RNA transcript in exac that was mapped to this gene,
+transcript_fullexac,N,RNA transcript in exac that was mapped to this gene,exac
+gene_nonpsychexac,N,gene name used in nonpsch exac,exac
+gene_fullpsychexac,N,gene name used in full exac,exac
+cds_start_nonpsychexac,N,gene start used in nonpsych exac,exac
+cds_start_fullpsychexac,N,gene start used in full exac,exac
+pLI_fullexac,Y,pLI score based on full exac data,exac
+pRec_fullexac,Y,pRec score based on full exac data,exac
+pNull_fullexac,Y,pNull score based on full exac data,exac
+fullexac_single_gene_match,Y,Whether or not the full exac gene name could be mapped to a single official gene symbol (if not the first official gene symbol was used),exac
+pLI_nonpsychexac,Y,pLI score based on exac subjects without psychiatric diagnosis,exac
+pRec_nonpsychexac,Y,pRec score based on exac subjects without psychiatric diagnosis,exac
+pNull_nonpsychexac,Y,pNull score based on exac subjects without psychiatric diagnosis,exac
+nonpsychexac_single_gene_match,Y,Whether or not the nonpsych exac gene name could be mapped to a single official gene symbol (if not the first official gene symbol was used),exac
+omim_phenos,Y,Phenotypes (including omim phenotype id) associated with this gene,omim
+omim_single_gene_match,Y,Whether or not the omim gene name could be mapped to a single official gene symbol (if not the first official gene symbol was used),omim
+gwascatalog_rsid,Y,rs ID of SNP in gwas catalog mapped to this gene,gwascatalog
+gwascatalog_mappedtrait,Y,"Trait associated with snp for this gwascatalog entry (if multiple snps in this gene were associated, the SNP with lowest p-value was selected)",gwascatalog
+gwascatalog_p,Y,P-value correpsonding to association of snp to trait in mapped gwascatalog entry,gwascatalog
+gwascatalog_pubmedid,Y,pubmed id associated with mapped gwas catalog association,gwascatalog
+cm_DLPFC_AveExpr,Y,Average RNA expression in DLFPC,commonmind
+cm_DLPFC_logFC,Y,log fold-change in expression in DLPFC tissue (SCZ vs control) ,commonmind
+cm_DLPFC_CI.L,N,lower bound log fold-change in epxression  in DLPFC tissue (SCZ vs control),commonmind
+cm_DLPFC_CI.R,N,upper bound log fold-change in epxression  in DLPFC tissue (SCZ vs control),commonmind
+cm_DLPFC_t,N,T-value differential expression in DPFC (SCZ vs control),commonmind
+cm_DLPFC_P.Value,Y,p-value differential expression in DPFC (SCZ vs control),commonmind
+cm_DLPFC_adj.P.Val,Y,Adjusted p-value differential expression in DPFC (SCZ vs control) [see commonmind data for adjustment procedure],commonmind
+cm_DLPFC_B,N,b-value differential expression in DPFC (SCZ vs control),commonmind
